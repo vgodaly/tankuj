@@ -6,7 +6,7 @@ Mobilná aplikácia na rýchlu evidenciu tankovaní a porozumenie nákladom na p
 
 ## Stav projektu
 
-Pripravujeme MVP. Repozitár obsahuje produktovú špecifikáciu, pravidlá výpočtov a plán práce; aplikácia zatiaľ nie je implementovaná.
+Pripravujeme MVP. Repozitár obsahuje produktovú špecifikáciu, pravidlá výpočtov, plán práce a klikateľný návrh obrazoviek. Mobilná aplikácia zatiaľ nie je implementovaná.
 
 Pracovný technologický návrh z roadmapy: React Native, Expo, TypeScript a lokálna SQLite databáza. Konkrétne verzie a kompatibilitu overíme podľa oficiálnej dokumentácie pri založení aplikácie.
 
@@ -14,6 +14,9 @@ Pracovný technologický návrh z roadmapy: React Native, Expo, TypeScript a lok
 
 - [Špecifikácia MVP](docs/mvp.md): používateľ, rozsah, toky a podmienky prijatia.
 - [Pravidlá výpočtov](docs/calculations.md): vstupy, spotreba, neistota a overovacie príklady.
+- [Návrh obrazoviek a UX](docs/ux-design.md): navigácia, komponenty, stavy a plán overenia s vodičmi.
+- [Klikateľný prototyp](design/README.md): lokálny náhľad používateľského toku.
+- [Kontrola prototypu](docs/prototype-review.md): overené scenáre a hranice overenia.
 - [Implementačný plán](docs/implementation-plan.md): malé úlohy a ich závislosti.
 - [Stav a rozhodnutia](docs/project-status.md): aktuálny kontext a ďalší krok.
 

@@ -1,0 +1,519 @@
+<style>
+  #tankuj-prototype {
+    --tk-bg: light-dark(#f4f5f0, #151b17);
+    --tk-paper: light-dark(#ffffff, #202923);
+    --tk-ink: light-dark(#17271e, #edf3ea);
+    --tk-muted: light-dark(#526457, #b2c1b5);
+    --tk-line: light-dark(#dde4da, #39473d);
+    --tk-green: light-dark(#286043, #a9d7ac);
+    --tk-on-green: light-dark(#ffffff, #143820);
+    --tk-soft: light-dark(#e6eee1, #2a3e2c);
+    --tk-error: light-dark(#a22c27, #ffb4ab);
+    --tk-error-bg: light-dark(#fff0ed, #412822);
+    --tk-warm: light-dark(#f3ebd6, #3c3522);
+    --tk-radius: 20px;
+    color: var(--tk-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    background: transparent;
+  }
+  #tankuj-prototype * { box-sizing: border-box; }
+  #tankuj-prototype [hidden] { display: none !important; }
+  #tankuj-prototype button,
+  #tankuj-prototype input,
+  #tankuj-prototype select { font: inherit; }
+  #tankuj-prototype button { touch-action: manipulation; }
+  #tankuj-prototype h1,
+  #tankuj-prototype h2,
+  #tankuj-prototype h3,
+  #tankuj-prototype p { margin: 0; }
+  #tankuj-prototype h1 { font-size: 30px; font-weight: 500; line-height: 1.16; letter-spacing: -1px; }
+  #tankuj-prototype h2 { font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -.4px; }
+  #tankuj-prototype h3 { font-size: 16px; font-weight: 500; }
+  #tankuj-prototype .tk-stage { padding: 20px 12px 26px; }
+  #tankuj-prototype .tk-preview-controls { max-width: 400px; margin: 0 auto 16px; padding-right: 48px; }
+  #tankuj-prototype .tk-preview-controls label { display: block; font-size: 12px; }
+  #tankuj-prototype .tk-preview-controls select { max-width: 100%; min-height: 44px; padding: 6px 8px; color: var(--tk-ink); background: var(--tk-paper); border: 1px solid var(--tk-line); border-radius: 10px; font-size: 14px; }
+  #tankuj-prototype .tk-caption { margin-top: 6px; font-size: 12px; color: var(--tk-muted); }
+  #tankuj-prototype .tk-device { max-width: 400px; margin: auto; background: var(--tk-bg); border: 1px solid var(--tk-line); border-radius: 32px; overflow: clip; box-shadow: 0 15px 45px light-dark(#17271e12, #00000030); }
+  #tankuj-prototype .tk-status { display: flex; justify-content: space-between; padding: 14px 24px 6px; font-size: 12px; font-weight: 500; }
+  #tankuj-prototype .tk-status span:last-child { color: var(--tk-muted); font-size: 11px; font-weight: 400; letter-spacing: .4px; }
+  #tankuj-prototype .tk-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 20px 14px; }
+  #tankuj-prototype .tk-brand { font-size: 24px; font-weight: 500; letter-spacing: -1.4px; color: var(--tk-green); }
+  #tankuj-prototype .tk-wordmark { font-size: 48px; font-weight: 500; letter-spacing: -3px; color: var(--tk-green); }
+  #tankuj-prototype .tk-main { padding: 10px 20px 26px; min-height: 420px; }
+  #tankuj-prototype .tk-stack { display: grid; gap: 20px; }
+  #tankuj-prototype .tk-tight { display: grid; gap: 10px; }
+  #tankuj-prototype .tk-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  #tankuj-prototype .tk-row > * { min-width: 0; }
+  #tankuj-prototype .tk-muted { color: var(--tk-muted); }
+  #tankuj-prototype .tk-small { font-size: 13px; }
+  #tankuj-prototype .tk-eyebrow { color: var(--tk-muted); font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; }
+  #tankuj-prototype .tk-title { margin-bottom: 6px; }
+  #tankuj-prototype .tk-summary { padding: 22px; background: var(--tk-paper); border-radius: var(--tk-radius); }
+  #tankuj-prototype .tk-amount { margin: 8px 0 4px; font-size: 42px; font-weight: 500; line-height: 1.15; letter-spacing: -1.8px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  #tankuj-prototype .tk-amount small { font-size: 23px; font-weight: 400; letter-spacing: -.5px; }
+  #tankuj-prototype .tk-consumption { padding-top: 18px; margin-top: 18px; border-top: 1px solid var(--tk-line); }
+  #tankuj-prototype .tk-consumption strong { font-size: 28px; font-weight: 500; letter-spacing: -.8px; }
+  #tankuj-prototype .tk-note { padding: 16px; border-radius: 16px; background: var(--tk-soft); }
+  #tankuj-prototype .tk-note.tk-warning { background: var(--tk-warm); }
+  #tankuj-prototype .tk-note p + p { margin-top: 6px; }
+  #tankuj-prototype .tk-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 10px 16px; border: 0; border-radius: 14px; color: var(--tk-on-green); background: var(--tk-green); font-weight: 500; text-decoration: none; }
+  #tankuj-prototype .tk-action.tk-secondary { background: var(--tk-soft); color: var(--tk-green); }
+  #tankuj-prototype .tk-action.tk-danger { background: var(--tk-error-bg); color: var(--tk-error); }
+  #tankuj-prototype .tk-action.tk-full { width: 100%; }
+  #tankuj-prototype .tk-action:disabled { opacity: .6; }
+  #tankuj-prototype .tk-link { min-height: 44px; padding: 8px 0; border: 0; background: transparent; color: var(--tk-green); text-align: left; font-size: 14px; }
+  #tankuj-prototype .tk-link.tk-danger { color: var(--tk-error); }
+  #tankuj-prototype .tk-list { background: var(--tk-paper); border-radius: var(--tk-radius); padding: 0 16px; }
+  #tankuj-prototype .tk-record { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 84px; padding: 14px 0; color: var(--tk-ink); background: transparent; border: 0; text-align: left; }
+  #tankuj-prototype .tk-record + .tk-record { border-top: 1px solid var(--tk-line); }
+  #tankuj-prototype .tk-record .tk-right { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  #tankuj-prototype .tk-record strong { font-weight: 500; }
+  #tankuj-prototype .tk-badge { display: inline-block; margin-top: 3px; padding: 2px 7px; border-radius: 6px; background: var(--tk-soft); color: var(--tk-green); font-size: 11px; }
+  #tankuj-prototype .tk-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 10px 12px 22px; gap: 6px; background: var(--tk-paper); border-top: 1px solid var(--tk-line); }
+  #tankuj-prototype .tk-nav button { min-height: 48px; border: 0; border-radius: 12px; background: transparent; color: var(--tk-muted); font-size: 12px; }
+  #tankuj-prototype .tk-nav button[aria-current="page"] { color: var(--tk-green); background: var(--tk-soft); font-weight: 500; }
+  #tankuj-prototype .tk-form label { display: grid; gap: 6px; font-weight: 500; }
+  #tankuj-prototype .tk-form input:not([type="checkbox"]) { width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--tk-line); border-radius: 12px; color: var(--tk-ink); background: var(--tk-paper); font-weight: 400; font-variant-numeric: tabular-nums; }
+  #tankuj-prototype .tk-form input[aria-invalid="true"] { border-color: var(--tk-error); }
+  #tankuj-prototype .tk-form small { font-size: 12px; font-weight: 400; color: var(--tk-muted); }
+  #tankuj-prototype .tk-form .tk-switch { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 14px 0; min-height: 52px; font-weight: 400; }
+  #tankuj-prototype input[type="checkbox"] { accent-color: var(--tk-green); width: 23px; height: 23px; flex-shrink: 0; margin: 3px 0; }
+  #tankuj-prototype fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  #tankuj-prototype legend { margin-bottom: 8px; font-size: 14px; }
+  #tankuj-prototype .tk-segment { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; background: var(--tk-soft); border-radius: 12px; }
+  #tankuj-prototype .tk-segment button { padding: 10px 8px; min-height: 44px; border: 0; border-radius: 9px; color: var(--tk-muted); background: transparent; }
+  #tankuj-prototype .tk-segment button[aria-pressed="true"] { color: var(--tk-ink); background: var(--tk-paper); font-weight: 500; }
+  #tankuj-prototype details { border-top: 1px solid var(--tk-line); padding-top: 10px; }
+  #tankuj-prototype summary { min-height: 44px; padding: 10px 0; color: var(--tk-green); font-size: 14px; }
+  #tankuj-prototype .tk-error { color: var(--tk-error); font-size: 13px; }
+  #tankuj-prototype .tk-alert { background: var(--tk-error-bg); color: var(--tk-error); border-radius: 12px; padding: 12px; font-size: 14px; }
+  #tankuj-prototype .tk-success-mark { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: var(--tk-soft); color: var(--tk-green); border-radius: 50%; font-size: 27px; }
+  #tankuj-prototype .tk-divider { height: 1px; background: var(--tk-line); margin: 4px 0; }
+  #tankuj-prototype .tk-metric-line { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--tk-line); }
+  #tankuj-prototype .tk-metric-line > :last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  #tankuj-prototype .tk-chart-row { display: grid; grid-template-columns: 84px minmax(0, 1fr) 54px; gap: 8px; align-items: center; margin-top: 16px; font-size: 13px; }
+  #tankuj-prototype .tk-track { background: var(--tk-soft); height: 8px; border-radius: 4px; }
+  #tankuj-prototype .tk-bar { background: var(--tk-green); height: 100%; border-radius: 4px; }
+  #tankuj-prototype .tk-modal-wrap { background: var(--tk-bg); }
+  #tankuj-prototype .tk-dialog { margin-top: 12px; padding: 20px; background: var(--tk-paper); border: 1px solid var(--tk-line); border-radius: 20px; }
+  #tankuj-prototype .tk-dialog .tk-action { margin-top: 8px; }
+  #tankuj-prototype .tk-home-indicator { width: 100px; height: 4px; border-radius: 4px; background: var(--tk-muted); margin: 0 auto 9px; opacity: .45; }
+  #tankuj-prototype.tk-large-text { font-size: 20px; }
+  #tankuj-prototype.tk-large-text .tk-small,
+  #tankuj-prototype.tk-large-text .tk-form small,
+  #tankuj-prototype.tk-large-text .tk-link,
+  #tankuj-prototype.tk-large-text .tk-record,
+  #tankuj-prototype.tk-large-text .tk-chart-row { font-size: 17px; }
+  #tankuj-prototype.tk-large-text .tk-row { flex-wrap: wrap; }
+  @media (max-width: 380px) {
+    #tankuj-prototype .tk-stage { padding: 14px 0; }
+    #tankuj-prototype .tk-main { padding: 8px 16px 22px; }
+    #tankuj-prototype .tk-top { padding-inline: 16px; }
+    #tankuj-prototype .tk-summary { padding: 18px; }
+    #tankuj-prototype .tk-amount { font-size: 37px; }
+    #tankuj-prototype .tk-device { border-radius: 24px; }
+    #tankuj-prototype .tk-preview-controls { padding-left: 8px; }
+  }
+</style>
+<div id="tankuj-prototype" lang="sk">
+  <div class="tk-stage viz-dotted-background">
+    <div class="tk-preview-controls">
+      <label for="tk-scenario">Scenár náhľadu</label>
+      <select id="tk-scenario">
+        <option value="history">Pravidelné používanie</option>
+        <option value="start">Prvé otvorenie</option>
+        <option value="first">Prvá plná nádrž</option>
+        <option value="partial">Čiastočné tankovanie</option>
+        <option value="gap">Vynechané tankovanie</option>
+        <option value="save-error">Chyba uloženia</option>
+        <option value="loading">Načítanie údajov</option>
+        <option value="database-error">Nedostupné údaje</option>
+      </select>
+      <p class="tk-caption">Klikateľný návrh · vymyslené údaje · zmeny iba v náhľade</p>
+    </div>
+    <section class="tk-device" aria-label="Tankuj — návrh mobilnej aplikácie">
+      <div class="tk-status" aria-hidden="true"><span>9:41</span><span>100 %</span></div>
+      <div class="tk-top"><span class="tk-brand">tankuj.</span><button class="tk-link cursor-interaction" type="button" data-action="settings">Nastavenia</button></div>
+      <main class="tk-main" id="tk-screen"></main>
+      <nav class="tk-nav" aria-label="Hlavná navigácia" id="tk-nav">
+        <button class="cursor-interaction" data-screen="overview" type="button" aria-current="page">Prehľad</button>
+        <button class="cursor-interaction" data-screen="history" type="button">História</button>
+        <button class="cursor-interaction" data-screen="stats" type="button">Štatistiky</button>
+      </nav>
+      <div class="tk-home-indicator" aria-hidden="true"></div>
+    </section>
+  </div>
+  <div id="tk-announcement" role="status" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)"></div>
+</div>
+<script>
+(() => {
+  "use strict";
+  const root = document.getElementById("tankuj-prototype");
+  const screen = root.querySelector("#tk-screen");
+  const navigation = root.querySelector("#tk-nav");
+  const scenarioSelect = root.querySelector("#tk-scenario");
+  const referenceDate = "2026-10-19";
+  const scenarios = new Set(Array.from(scenarioSelect.options, option => option.value));
+  const views = new Set(["onboarding", "overview", "history", "stats", "form", "success", "detail", "settings", "loading", "database-error", "restore"]);
+  const sampleRecords = [
+    { id: "sample-1", date: "2026-09-28", odo: 124200, liters: 42, amount: 65.10, full: true, mode: "amount" },
+    { id: "sample-2", date: "2026-10-05", odo: 124520, liters: 20, amount: 30.60, full: false, mode: "amount" },
+    { id: "sample-3", date: "2026-10-12", odo: 124980, liters: 28, amount: 44.52, full: true, mode: "amount" },
+    { id: "sample-4", date: "2026-10-19", odo: 125560, liters: 35.96, amount: 56.10, full: true, mode: "amount" }
+  ];
+  let state;
+  let draft = null;
+  let formOrigin = "overview";
+  let selectedId = null;
+  let notice = "";
+  let modal = null;
+  let busy = false;
+  let pendingMode = null;
+  let lastSaveWasEdit = false;
+  const presentation = { largeText: false };
+  const clone = value => JSON.parse(JSON.stringify(value));
+  const escape = value => String(value).replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+  const number = (value, places = 2) => new Intl.NumberFormat("sk-SK", { minimumFractionDigits: places, maximumFractionDigits: places }).format(value);
+  const money = value => number(value) + " €";
+  const countLabel = (value, one, few, many) => value + " " + (value === 1 ? one : value >= 2 && value <= 4 ? few : many);
+  const dateLabel = date => new Intl.DateTimeFormat("sk-SK", { day: "numeric", month: "numeric" }).format(new Date(date + "T12:00:00"));
+  const fullDateLabel = date => new Intl.DateTimeFormat("sk-SK", { day: "numeric", month: "numeric", year: "numeric" }).format(new Date(date + "T12:00:00"));
+  const isCalendarDate = date => typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) && !Number.isNaN(Date.parse(date)) && new Date(date + "T12:00:00Z").toISOString().slice(0, 10) === date;
+  const sorted = () => [...state.records].sort((a, b) => a.date.localeCompare(b.date) || a.odo - b.odo);
+  const action = (label, name, extra = "") => '<button type="button" class="tk-action tk-full cursor-interaction ' + extra + '" data-action="' + name + '">' + label + "</button>";
+  const heading = (title, subtitle = "") => '<div><h1 class="tk-title">' + title + "</h1>" + (subtitle ? '<p class="tk-muted tk-small">' + subtitle + "</p>" : "") + "</div>";
+  const metric = (label, value) => '<div class="tk-metric-line"><span class="tk-muted tk-small">' + label + "</span><span>" + value + "</span></div>";
+  function announce(message) { root.querySelector("#tk-announcement").textContent = message; }
+  function reset(scenario) {
+    const records = scenario === "start" ? [] : scenario === "first" ? sampleRecords.slice(0, 1) : scenario === "partial" ? sampleRecords.slice(0, 2) : sampleRecords;
+    state = { scenario, screen: scenario === "start" ? "onboarding" : scenario === "loading" ? "loading" : scenario === "database-error" ? "database-error" : "overview", vehicle: { name: "Moje auto", fuel: "Benzín" }, records: clone(records), gaps: scenario === "gap" ? [{ id: "sample-gap", odo: 124980 }] : [], failNextSave: scenario === "save-error" };
+    draft = null; modal = null; notice = ""; selectedId = null; busy = false;
+    scenarioSelect.value = scenario;
+    render();
+  }
+  function measurement() {
+    const intervals = [];
+    let baseline = null;
+    let liters = 0;
+    let lastGap = null;
+    for (const record of sorted()) {
+      if (baseline && state.gaps.some(gap => gap.odo > baseline.odo && gap.odo <= record.odo)) {
+        baseline = null; liters = 0; lastGap = record;
+      }
+      if (!baseline) {
+        if (record.full) baseline = record;
+        continue;
+      }
+      liters += record.liters;
+      if (record.full) {
+        intervals.push({ start: baseline, end: record, liters, km: record.odo - baseline.odo, value: liters / (record.odo - baseline.odo) * 100 });
+        baseline = record; liters = 0;
+      }
+    }
+    const totalKm = intervals.reduce((sum, interval) => sum + interval.km, 0);
+    const totalLiters = intervals.reduce((sum, interval) => sum + interval.liters, 0);
+    const latest = sorted().at(-1);
+    const pendingGap = latest && state.gaps.some(gap => gap.odo > latest.odo);
+    return { intervals, baseline, lastGap, pendingGap, value: totalKm ? totalLiters / totalKm * 100 : null, totalKm };
+  }
+  function measurementNote() {
+    const result = measurement();
+    if (result.pendingGap) return "Po vynechanom tankovaní začneme merať od ďalšej plnej nádrže.";
+    if (!result.baseline) return "Pri najbližšom tankovaní do plnej začneme merať spotrebu.";
+    const latest = sorted().at(-1);
+    if (latest && !latest.full) return "Tankovanie je zapísané. Spotrebu dopočítame pri ďalšej plnej nádrži.";
+    if (!result.intervals.length) return "Prvá plná nádrž je základ. Spotrebu uvidíš po ďalšom tankovaní do plnej.";
+    return "Počítame z úplných intervalov medzi plnými nádržami.";
+  }
+  function recordRow(record) {
+    return '<button type="button" class="tk-record cursor-interaction" data-record="' + escape(record.id) + '"><span><strong>' + fullDateLabel(record.date) + '</strong><br><span class="tk-muted tk-small">' + number(record.odo, 0) + ' km</span><br><span class="tk-badge">' + (record.full ? "Plná nádrž" : "Čiastočné") + '</span></span><span class="tk-right"><strong>' + money(record.amount) + '</strong><br><span class="tk-muted tk-small">' + number(record.liters, 2) + " l</span></span></button>";
+  }
+  function overview() {
+    const result = measurement();
+    const records = sorted();
+    const october = records.filter(record => record.date.startsWith("2026-10"));
+    const spend = october.reduce((sum, record) => sum + record.amount, 0);
+    const latest = records.at(-1);
+    const previous = records.at(-2);
+    const difference = latest && previous ? latest.amount / latest.liters - previous.amount / previous.liters : null;
+    let content = '<div class="tk-stack">' + heading("Tvoje jazdy.<br>Jasnejšie.", escape(state.vehicle.name) + " · " + escape(state.vehicle.fuel));
+    content += '<section class="tk-summary" aria-label="Súhrn tankovaní"><p class="tk-eyebrow">Zaplatené v októbri</p><div class="tk-amount">' + number(spend) + ' <small>€</small></div><p class="tk-muted tk-small">' + countLabel(october.length, "evidované tankovanie", "evidované tankovania", "evidovaných tankovaní") + ' · október 2026</p><div class="tk-consumption"><div class="tk-row"><span class="tk-muted tk-small">Priemerná spotreba</span><span>' + (result.value === null ? "—" : "<strong>" + number(result.value) + "</strong>") + '</span></div><p class="tk-muted tk-small">' + (result.value === null ? "Zatiaľ bez platného merania" : "l/100 km · " + countLabel(result.intervals.length, "platný interval", "platné intervaly", "platných intervalov")) + "</p></div></section>";
+    content += action("+ Pridať tankovanie", "add");
+    if (result.value === null || (latest && !latest.full) || state.gaps.length) {
+      content += '<section class="tk-note ' + (state.gaps.length ? "tk-warning" : "") + '"><h3>' + (state.gaps.length ? "Pokračujeme v meraní" : "Každý záznam sa počíta") + '</h3><p class="tk-small">' + measurementNote() + (state.gaps.length && result.value !== null ? " Neúplné úseky vynechávame." : "") + "</p></section>";
+    } else if (difference !== null) {
+      const priceText = Math.abs(difference) < .0005 ? "Pri posledných dvoch tankovaniach bola cena za liter rovnaká." : "Pri poslednom tankovaní bol liter o " + number(Math.abs(difference), 3) + " € " + (difference < 0 ? "lacnejší." : "drahší.");
+      content += '<section class="tk-note"><p class="tk-eyebrow">Malé zistenie</p><h3 style="margin-top:6px">Tvoja cena paliva</h3><p class="tk-small" style="margin-top:6px">' + priceText + '</p><p class="tk-muted tk-small">' + fullDateLabel(previous.date) + " → " + fullDateLabel(latest.date) + "</p></section>";
+    }
+    content += '<section><div class="tk-row"><h2>Posledné tankovanie</h2><button class="tk-link cursor-interaction" type="button" data-screen="history">História →</button></div>';
+    content += latest ? '<div class="tk-list">' + recordRow(latest) + "</div>" : '<p class="tk-muted tk-small">Tvoja história sa začne prvým tankovaním.</p>';
+    return content + "</section></div>";
+  }
+  function history() {
+    const records = sorted().reverse();
+    return '<div class="tk-stack">' + heading("História", "Každé tankovanie na svojom mieste.") + action("+ Pridať tankovanie", "add") + (records.length ? '<div class="tk-list">' + records.map(recordRow).join("") + "</div>" : '<section class="tk-note"><h2>Zatiaľ bez záznamov</h2><p class="tk-small">Zapíš prvé tankovanie. Hneď uvidíš litre, sumu a cenu za liter.</p></section>') + "</div>";
+  }
+  function stats() {
+    const result = measurement();
+    const records = sorted();
+    const sum = key => records.reduce((total, record) => total + record[key], 0);
+    let html = '<div class="tk-stack">' + heading("Štatistiky", "Vlastné údaje. Zrozumiteľné súvislosti.");
+    html += '<section class="tk-summary"><p class="tk-eyebrow">Celková spotreba</p><div class="tk-amount">' + (result.value === null ? "—" : number(result.value)) + '</div><p class="tk-muted tk-small">l/100 km · vážené vzdialenosťou</p>';
+    if (result.intervals.length) html += '<p class="tk-muted tk-small" style="margin-top:12px">' + fullDateLabel(result.intervals[0].start.date) + " – " + fullDateLabel(result.intervals.at(-1).end.date) + " · " + number(result.totalKm, 0) + " km v " + result.intervals.length + " platných intervaloch</p>";
+    html += "</section>";
+    if (result.intervals.length) {
+      const max = Math.max(...result.intervals.map(interval => interval.value));
+      html += '<section class="tk-summary"><h2>Spotreba po intervaloch</h2><p class="tk-muted tk-small">l/100 km · nie kalendárne mesiace</p>';
+      for (const interval of result.intervals) html += '<div class="tk-chart-row" aria-label="' + dateLabel(interval.start.date) + " až " + dateLabel(interval.end.date) + ": " + number(interval.value) + ' litrov na 100 kilometrov"><span>' + dateLabel(interval.start.date) + " – " + dateLabel(interval.end.date) + '</span><div class="tk-track" aria-hidden="true"><div class="tk-bar" style="width:' + interval.value / max * 100 + '%"></div></div><span>' + number(interval.value) + "</span></div>";
+      html += "</section>";
+    } else html += '<section class="tk-note"><h3>Na meranie potrebujeme plné nádrže</h3><p class="tk-small">' + measurementNote() + "</p></section>";
+    if (state.gaps.length) html += '<section class="tk-note tk-warning"><h3>Niektoré údaje chýbajú</h3><p class="tk-small">Neúplné úseky sú zo spotreby vynechané. Platby zahŕňajú iba zapísané tankovania.</p><button type="button" class="tk-link cursor-interaction" data-action="resolve-gap">Doplnil som chýbajúce tankovania →</button></section>';
+    html += '<section><h2>Zaplatené palivo</h2>' + metric("Celkom v evidencii", money(sum("amount"))) + metric("Natankované", number(sum("liters"), 2) + " l") + metric("Priemerná cena za liter", sum("liters") ? number(sum("amount") / sum("liters"), 3) + " €/l" : "—") + '<p class="tk-muted tk-small" style="margin-top:12px">Platby za tankovania sa nemusia rovnať hodnote paliva spotrebovaného v rovnakom období.</p></section></div>';
+    return html;
+  }
+  function onboarding() {
+    return '<form id="tk-onboarding" class="tk-stack tk-form"><div class="tk-wordmark">tankuj.</div>' + heading("Menej zadávania.<br>Viac prehľadu.", "Zapíš tankovanie. Spoznaj svoju spotrebu a výdavky.") + '<p class="tk-small tk-muted">Bez účtu. Funguje aj bez internetu.</p><fieldset><legend>Na čo jazdíš?</legend><div class="tk-segment"><button type="button" data-fuel="Benzín" aria-pressed="true" class="cursor-interaction">Benzín</button><button type="button" data-fuel="Diesel" aria-pressed="false" class="cursor-interaction">Diesel</button></div></fieldset><label for="tk-vehicle">Názov auta <small>Voliteľné</small><input id="tk-vehicle" name="vehicle" maxlength="40" placeholder="Moje auto" autocomplete="off"></label><button type="submit" class="tk-action tk-full cursor-interaction">Začať zapisovať</button><p class="tk-muted tk-small">História zostáva v tvojom telefóne. V nastaveniach ju môžeš zálohovať.</p></form>';
+  }
+  function openForm(record = null) {
+    formOrigin = state.screen;
+    selectedId = record ? record.id : null;
+    draft = { date: record ? record.date : referenceDate, odo: record ? String(record.odo) : "", liters: record ? String(record.liters) : "", price: record ? String(record.mode === "unit" ? record.enteredUnitPrice : record.amount) : "", mode: record ? record.mode : "amount", full: record ? record.full : false, missed: record ? state.gaps.some(gap => gap.id === record.id) : false, more: false, dirty: false };
+    state.screen = "form"; notice = ""; render();
+  }
+  function inputField(key, label, help, mode) {
+    return '<label for="tk-' + key + '">' + label + '<input id="tk-' + key + '" name="' + key + '" type="text" inputmode="' + mode + '" autocomplete="off" value="' + escape(draft[key]) + '" aria-describedby="tk-' + key + '-help tk-' + key + '-error"><small id="tk-' + key + '-help">' + help + '</small><span class="tk-error" id="tk-' + key + '-error" role="alert"></span></label>';
+  }
+  function form() {
+    const latest = sorted().filter(record => record.id !== selectedId).at(-1);
+    return '<div class="tk-stack"><div class="tk-row"><h1>' + (selectedId ? "Upraviť záznam" : "Nové tankovanie") + '</h1><button type="button" class="tk-link cursor-interaction" data-action="close-form">Zrušiť</button></div><form id="tk-refuel" class="tk-stack tk-form" novalidate>' +
+      inputField("odo", "Stav tachometra · km", latest ? "Posledný záznam: " + number(latest.odo, 0) + " km" : "Aktuálny stav na palubnej doske", "numeric") +
+      inputField("liters", "Natankované litre · l", "Údaj z účtenky, napríklad 32,50", "decimal") +
+      '<fieldset><legend>Čo zadáš z účtenky?</legend><div class="tk-segment"><button type="button" class="cursor-interaction" data-mode="amount" aria-pressed="' + (draft.mode === "amount") + '">Celkovú sumu</button><button type="button" class="cursor-interaction" data-mode="unit" aria-pressed="' + (draft.mode === "unit") + '">Cenu za liter</button></div></fieldset>' +
+      inputField("price", draft.mode === "amount" ? "Zaplatená suma · €" : "Cena za liter · €/l", draft.mode === "amount" ? "Cena za liter sa dopočíta." : "Celkovú sumu dopočítame na centy.", "decimal") +
+      '<p id="tk-price-preview" class="tk-muted tk-small"></p><label class="tk-switch" for="tk-full"><span>Do plnej nádrže<br><small>Plná nádrž nám pomáha merať spotrebu.</small></span><input id="tk-full" name="full" type="checkbox"' + (draft.full ? " checked" : "") + '></label><label for="tk-date">Dátum tankovania<input id="tk-date" name="date" type="date" value="' + draft.date + '" max="' + referenceDate + '" aria-describedby="tk-date-error"><span class="tk-error" id="tk-date-error"></span></label><details id="tk-more"' + (draft.more || draft.missed ? " open" : "") + '><summary class="cursor-interaction">Ďalšie možnosti</summary><label class="tk-switch" for="tk-missed"><span>Od predchádzajúceho záznamu som vynechal tankovanie<br><small>Tento úsek nezahrnieme do spotreby.</small></span><input type="checkbox" id="tk-missed" name="missed"' + (draft.missed ? " checked" : "") + '></label></details><div id="tk-form-message"' + (notice ? ' role="alert" class="tk-alert"' : "") + ">" + escape(notice) + '</div><button id="tk-save" class="tk-action tk-full cursor-interaction" type="submit">Uložiť tankovanie</button></form></div>';
+  }
+  function detail() {
+    const record = state.records.find(item => item.id === selectedId);
+    if (!record) return history();
+    return '<div class="tk-stack"><button type="button" class="tk-link cursor-interaction" data-screen="history">← História</button>' + heading("Tankovanie", fullDateLabel(record.date) + " · " + (record.full ? "Plná nádrž" : "Čiastočné tankovanie")) + '<section class="tk-summary"><p class="tk-eyebrow">Zaplatené</p><div class="tk-amount">' + money(record.amount) + '</div>' + metric("Tachometer", number(record.odo, 0) + " km") + metric("Natankované", number(record.liters, 3) + " l") + metric("Efektívna cena za liter", number(record.amount / record.liters, 3) + " €/l") + '</section>' + action("Upraviť záznam", "edit") + action("Vymazať záznam", "delete", "tk-danger") + "</div>";
+  }
+  function success() {
+    const record = state.records.find(item => item.id === selectedId);
+    const interval = measurement().intervals.find(item => item.end.id === selectedId);
+    const title = lastSaveWasEdit ? "Zmeny uložené" : "Tankovanie uložené";
+    const subtitle = lastSaveWasEdit ? "Históriu a dostupné výsledky sme prepočítali." : "O jeden záznam bližšie k lepšiemu prehľadu.";
+    return '<div class="tk-stack"><div class="tk-success-mark" aria-hidden="true">✓</div>' + heading(title, subtitle) + '<section class="tk-summary"><p class="tk-eyebrow">Tvoje tankovanie</p><div class="tk-amount">' + money(record.amount) + '</div><p class="tk-muted">' + number(record.liters, 2) + " l · " + number(record.amount / record.liters, 3) + " €/l</p></section>" + (interval ? '<section class="tk-note"><h2>' + number(interval.value) + ' l/100 km</h2><p class="tk-small">Spotreba na ' + number(interval.km, 0) + " km medzi " + fullDateLabel(interval.start.date) + " a " + fullDateLabel(interval.end.date) + ".</p></section>" : '<section class="tk-note"><h3>' + (lastSaveWasEdit ? "História je aktualizovaná" : record.full ? "Plná nádrž je základ merania" : "Aj čiastočné tankovanie sa počíta") + '</h3><p class="tk-small">' + measurementNote() + "</p></section>") + action("Späť na prehľad", "overview") + "</div>";
+  }
+  function settings() {
+    return '<div class="tk-stack"><button type="button" class="tk-link cursor-interaction" data-screen="overview">← Prehľad</button>' + heading("Nastavenia", "Tvoje auto a tvoje údaje.") + '<section class="tk-summary">' + metric("Vozidlo", escape(state.vehicle.name)) + metric("Palivo", escape(state.vehicle.fuel)) + metric("Jednotky", "km · l · EUR") + '</section><section class="tk-tight"><h2>Históriu máš vo svojich rukách</h2><p class="tk-muted tk-small">Záloha umožní obnoviť údaje pri výmene telefónu. Súbor nie je šifrovaný.</p>' + action("Exportovať CSV", "export", "tk-secondary") + action("Vytvoriť zálohu", "backup", "tk-secondary") + action("Obnoviť zo zálohy", "restore", "tk-secondary") + '</section><section class="tk-note"><h3>Ako meriame spotrebu</h3><p class="tk-small">Medzi dvomi plnými nádržami sčítame litre a vydelíme ich prejdenými kilometrami. Pri chýbajúcom zázname začneme od novej plnej nádrže.</p></section></div>';
+  }
+  function restore() {
+    return '<div class="tk-stack">' + heading("Obnoviť históriu?", "Náhľad vybranej ukážkovej zálohy") + '<section class="tk-summary">' + metric("Vozidlo", "Moje auto · Benzín") + metric("Počet tankovaní", "4") + metric("Obdobie", "28. 9. – 19. 10. 2026") + '</section><section class="tk-note tk-warning"><h3>Súčasná história sa nahradí</h3><p class="tk-small">Záloha sa nezlúči s existujúcimi záznamami. Pred pokračovaním si môžeš vytvoriť zálohu aktuálnych údajov.</p></section>' + action("Zálohovať súčasné údaje", "backup", "tk-secondary") + action("Nahradiť históriu", "confirm-restore") + action("Zrušiť", "settings", "tk-secondary") + "</div>";
+  }
+  function modalMarkup() {
+    if (!modal) return "";
+    let body;
+    if (modal === "discard") body = heading("Zahodiť zmeny?", "Neuložené údaje sa stratia.") + action("Pokračovať v úprave", "dismiss") + action("Zahodiť zmeny", "discard", "tk-danger");
+    if (modal === "mode") body = heading("Zmeniť spôsob zadania?", "Aktuálnu cenu vymažeme. Novú hodnotu zadaj z účtenky, aby zaokrúhlenie nezmenilo zaplatenú sumu.") + action("Zmeniť zadávanie", "confirm-mode") + action("Ponechať údaje", "dismiss", "tk-secondary");
+    if (modal === "delete") body = heading("Vymazať záznam?", "Vyber, či tankovanie naozaj prebehlo. Pomôže nám to zachovať správnu spotrebu.") + action("Prebehlo, odstrániť z evidencie", "delete-real", "tk-danger") + action("Bol to chybný alebo duplicitný záznam", "delete-wrong", "tk-secondary") + action("Ponechať záznam", "dismiss", "tk-secondary");
+    if (modal === "resolve-gap") {
+      const gap = state.gaps[0];
+      const before = sorted().filter(record => record.odo < gap.odo).at(-1);
+      const after = sorted().find(record => record.odo >= gap.odo);
+      const range = (before ? number(before.odo, 0) : "začiatku evidencie") + (after ? " – " + number(after.odo, 0) + " km" : " km a ďalej");
+      body = heading("Je tento úsek už úplný?", "Úsek: " + range + ". Potvrď až po doplnení všetkých chýbajúcich tankovaní v tomto úseku.") + action("Áno, tankovania v úseku sú doplnené", "confirm-complete") + action("Ešte nie", "dismiss", "tk-secondary");
+    }
+    if (modal === "backup" || modal === "export") body = heading("Ukážka zdieľania súboru", modal === "backup" ? "tankuj-2026-10-19.json · záloha histórie" : "tankuj-2026-10-19.csv · export tankovaní") + '<p class="tk-muted tk-small" style="margin:12px 0">V tomto prototype sa súbor nevytvára ani neodosiela.</p>' + action("Zavrieť náhľad", "dismiss");
+    return '<section class="tk-dialog tk-stack" role="dialog" aria-modal="true" aria-label="Potvrdenie">' + body + "</section>";
+  }
+  function render() {
+    const functions = { onboarding, overview, history, stats, form, detail, success, settings, restore, loading: () => '<div class="tk-stack">' + heading("Načítavame históriu", "Tvoje uložené tankovania budú o chvíľu pripravené.") + '<p role="status" class="tk-muted">Načítavanie…</p>' + action("Dokončiť ukážku načítania", "finish-loading", "tk-secondary") + "</div>", "database-error": () => '<div class="tk-stack">' + heading("Históriu sa nepodarilo načítať", "Údaje sme nevymazali. Skús načítanie zopakovať.") + action("Skúsiť znova", "finish-loading") + "</div>" };
+    if (modal) {
+      screen.innerHTML = '<div class="tk-modal-wrap">' + modalMarkup() + "</div>";
+    } else screen.innerHTML = functions[state.screen]();
+    navigation.hidden = modal !== null || !["overview", "history", "stats"].includes(state.screen);
+    root.querySelector(".tk-top").hidden = ["onboarding", "form", "success"].includes(state.screen) || modal !== null;
+    for (const button of navigation.querySelectorAll("button")) {
+      if (button.dataset.screen === state.screen) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
+    }
+    for (const button of root.querySelectorAll("button:not(.cursor-interaction)")) button.classList.add("cursor-interaction");
+    scenarioSelect.disabled = busy || modal !== null;
+    if (modal) screen.querySelector(".tk-dialog button").focus();
+    if (state.screen === "form" && !modal) updatePricePreview();
+  }
+  function navigate(view) {
+    state.screen = view; modal = null; notice = ""; render(); persist();
+    announce(({ overview: "Prehľad", history: "História tankovaní", stats: "Štatistiky", settings: "Nastavenia" })[view] || "");
+  }
+  function parseInput(raw, precision, allowZero = false) {
+    const normalized = raw.trim().replace(",", ".");
+    if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+    if ((normalized.split(".")[1] || "").length > precision) return null;
+    const value = Number(normalized);
+    if (!Number.isFinite(value) || value > 1e9 || (allowZero ? value < 0 : value <= 0)) return null;
+    return value;
+  }
+  function updatePricePreview() {
+    const liters = parseInput(draft.liters, 3);
+    const price = parseInput(draft.price, draft.mode === "amount" ? 2 : 3);
+    const element = root.querySelector("#tk-price-preview");
+    if (element) element.textContent = liters && price ? draft.mode === "amount" ? "Vypočítaná cena: " + number(price / liters, 3) + " €/l" : "Vypočítaná suma: " + money(Math.round((liters * price + Number.EPSILON) * 100) / 100) : "";
+  }
+  function validation() {
+    const errors = {};
+    const odo = parseInput(draft.odo, 0, true);
+    const liters = parseInput(draft.liters, 3);
+    const price = parseInput(draft.price, draft.mode === "amount" ? 2 : 3);
+    if (odo === null) errors.odo = "Zadaj nezáporný stav tachometra v celých kilometroch.";
+    if (liters === null) errors.liters = "Zadaj kladný počet litrov, najviac na 3 desatinné miesta.";
+    if (price === null) errors.price = draft.mode === "amount" ? "Zadaj kladnú sumu, najviac na 2 desatinné miesta." : "Zadaj kladnú cenu, najviac na 3 desatinné miesta.";
+    const validDate = isCalendarDate(draft.date);
+    if (!validDate || draft.date > referenceDate) errors.date = "Vyber platný dátum najneskôr 19. 10. 2026.";
+    if (odo !== null && validDate) {
+      const others = sorted().filter(record => record.id !== selectedId);
+      const conflict = others.some(record => record.odo === odo || record.date < draft.date && record.odo >= odo || record.date > draft.date && record.odo <= odo);
+      if (conflict) errors.odo = "Tachometer nesedí s históriou. Skontroluj kilometre alebo dátum.";
+    }
+    const amount = draft.mode === "amount" ? price : Math.round((liters * price + Number.EPSILON) * 100) / 100;
+    if (liters !== null && price !== null && (!Number.isFinite(amount) || amount < .01 || amount > 1e9)) errors.price = "Výsledná suma musí byť aspoň 0,01 € a v podporovanom rozsahu.";
+    return { errors, odo, liters, price, amount };
+  }
+  function showErrors(errors) {
+    for (const key of ["odo", "liters", "price", "date"]) {
+      root.querySelector("#tk-" + key + "-error").textContent = errors[key] || "";
+      root.querySelector("#tk-" + key).setAttribute("aria-invalid", String(Boolean(errors[key])));
+    }
+    const first = Object.keys(errors)[0];
+    if (first) root.querySelector("#tk-" + first).focus();
+    announce("Skontroluj označené údaje.");
+  }
+  async function save() {
+    if (busy) return;
+    const { errors, odo, liters, price, amount } = validation();
+    if (Object.keys(errors).length) { showErrors(errors); return; }
+    busy = true;
+    scenarioSelect.disabled = true;
+    const saveButton = root.querySelector("#tk-save");
+    saveButton.disabled = true; saveButton.textContent = "Ukladám…";
+    await new Promise(resolve => setTimeout(resolve, 220));
+    if (state.failNextSave) {
+      state.failNextSave = false; busy = false; notice = "Tankovanie sa nepodarilo uložiť. Údaje zostali vo formulári. Skús to znova.";
+      render(); announce(notice); return;
+    }
+    const id = selectedId || "record-" + Date.now();
+    const old = state.records.find(record => record.id === id);
+    lastSaveWasEdit = Boolean(old);
+    const record = { id, date: draft.date, odo, liters, amount, full: draft.full, mode: draft.mode };
+    if (draft.mode === "unit") record.enteredUnitPrice = price;
+    if (old) state.records = state.records.map(item => item.id === id ? record : item);
+    else state.records.push(record);
+    if (old && old.odo !== odo && state.gaps.some(gap => gap.id === id)) state.gaps.push({ id: "moved-" + id, odo: old.odo });
+    state.gaps = state.gaps.filter(gap => gap.id !== id);
+    if (draft.missed) state.gaps.push({ id, odo });
+    selectedId = id; draft = null; busy = false; state.screen = "success"; notice = "";
+    render(); persist(); announce("Tankovanie uložené.");
+  }
+  function closeForm() {
+    if (busy) return;
+    if (draft && draft.dirty) { modal = "discard"; render(); }
+    else navigate(formOrigin === "detail" ? "detail" : formOrigin);
+  }
+  function persist() {
+    if (!window.openai || !window.openai.setWidgetState) return;
+    const snapshot = { version: 1, scenario: state.scenario, screen: ["form", "success", "detail", "restore"].includes(state.screen) ? "overview" : state.screen, vehicle: state.vehicle, records: state.records, gaps: state.gaps, failNextSave: state.failNextSave };
+    if (JSON.stringify(snapshot).length > 12000) return;
+    window.openai.setWidgetState({ modelContent: { scenario: state.scenario, screen: snapshot.screen, recordCount: state.records.length }, privateContent: snapshot }).catch(() => {});
+  }
+  function restoreSnapshot(value) {
+    if (!value || value.version !== 1 || !scenarios.has(value.scenario) || !views.has(value.screen) || !Array.isArray(value.records) || value.records.length > 30 || !Array.isArray(value.gaps)) return false;
+    if (!value.vehicle || typeof value.vehicle.name !== "string" || !["Benzín", "Diesel"].includes(value.vehicle.fuel)) return false;
+    if (!value.records.every(record => typeof record.id === "string" && isCalendarDate(record.date) && record.date <= referenceDate && Number.isInteger(record.odo) && record.odo >= 0 && Number.isFinite(record.liters) && record.liters > 0 && Number.isFinite(record.amount) && record.amount > 0 && typeof record.full === "boolean" && ["amount", "unit"].includes(record.mode) && (record.mode !== "unit" || Number.isFinite(record.enteredUnitPrice) && record.enteredUnitPrice > 0))) return false;
+    if (!value.gaps.every(gap => typeof gap.id === "string" && Number.isFinite(gap.odo))) return false;
+    state = clone(value); selectedId = null; modal = null; draft = null; notice = ""; busy = false;
+    if (["form", "success", "detail", "restore"].includes(state.screen)) state.screen = "overview";
+    scenarioSelect.value = state.scenario; render(); return true;
+  }
+  root.addEventListener("input", event => {
+    if (!draft || !event.target.closest("#tk-refuel")) return;
+    const input = event.target;
+    if (["odo", "liters", "price", "date"].includes(input.name)) draft[input.name] = input.value;
+    if (["full", "missed"].includes(input.name)) draft[input.name] = input.checked;
+    draft.dirty = true; updatePricePreview();
+  });
+  root.addEventListener("change", event => {
+    if (event.target === scenarioSelect) { reset(scenarioSelect.value); persist(); announce("Scenár náhľadu zmenený."); }
+  });
+  root.addEventListener("submit", event => {
+    event.preventDefault();
+    if (event.target.id === "tk-refuel") save();
+    if (event.target.id === "tk-onboarding") {
+      state.vehicle.name = root.querySelector("#tk-vehicle").value.trim() || "Moje auto";
+      navigate("overview");
+    }
+  });
+  root.addEventListener("click", event => {
+    const button = event.target.closest("button");
+    if (!button || !root.contains(button) || busy) return;
+    if (button.dataset.fuel) {
+      state.vehicle.fuel = button.dataset.fuel;
+      for (const choice of root.querySelectorAll("[data-fuel]")) choice.setAttribute("aria-pressed", String(choice === button));
+      return;
+    }
+    if (button.dataset.record) { selectedId = button.dataset.record; navigate("detail"); return; }
+    if (button.dataset.screen) { navigate(button.dataset.screen); return; }
+    if (button.dataset.mode && draft && button.dataset.mode !== draft.mode) {
+      pendingMode = button.dataset.mode;
+      if (draft.price.trim()) { modal = "mode"; render(); }
+      else { draft.mode = pendingMode; draft.dirty = true; render(); }
+      return;
+    }
+    const name = button.dataset.action;
+    if (name === "add") openForm();
+    if (name === "edit") openForm(state.records.find(record => record.id === selectedId));
+    if (name === "close-form") { draft.more = root.querySelector("#tk-more").open; closeForm(); }
+    if (name === "overview" || name === "settings") navigate(name);
+    if (name === "dismiss") { modal = null; render(); }
+    if (name === "discard") { draft = null; navigate(formOrigin); }
+    if (name === "confirm-mode") { draft.mode = pendingMode; draft.price = ""; draft.dirty = true; modal = null; render(); }
+    if (["delete", "backup", "export", "resolve-gap"].includes(name)) { modal = name; render(); }
+    if (name === "restore") navigate("restore");
+    if (name === "confirm-restore") {
+      state.records = clone(sampleRecords); state.gaps = []; navigate("overview"); announce("Ukážková história obnovená.");
+    }
+    if (name === "confirm-complete") { state.gaps = state.gaps.slice(1); modal = null; render(); persist(); announce("Úplnosť úseku potvrdená."); }
+    if (name === "finish-loading") navigate("overview");
+    if (name === "delete-real" || name === "delete-wrong") {
+      const record = state.records.find(item => item.id === selectedId);
+      if (name === "delete-real") state.gaps.push({ id: "deleted-" + record.id, odo: record.odo });
+      state.records = state.records.filter(item => item.id !== selectedId);
+      selectedId = null; modal = null; navigate("history"); announce("Záznam vymazaný.");
+    }
+  });
+  root.addEventListener("keydown", event => {
+    if (event.key === "Tab" && modal) {
+      const buttons = [...screen.querySelectorAll(".tk-dialog button")];
+      if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1).focus(); }
+      if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0].focus(); }
+    }
+    if (event.key === "Escape") {
+      if (modal) { modal = null; render(); }
+      else if (state.screen === "form") closeForm();
+    }
+  });
+  reset("history");
+  if (window.openai && window.openai.widgetState) restoreSnapshot(window.openai.widgetState.privateContent);
+  window.addEventListener("openai:set_globals", event => {
+    const globals = event.detail && event.detail.globals;
+    if (globals && globals.widgetState) restoreSnapshot(globals.widgetState.privateContent);
+  });
+  if (globalThis.Tweak) {
+    const tweak = new Tweak({ container: root.querySelector(".tk-device"), onChange: () => root.classList.toggle("tk-large-text", presentation.largeText) });
+    tweak.addToggle(presentation, "largeText", { label: "Zväčšený text" });
+  }
+})();
+</script>

@@ -35,6 +35,9 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Dokončené
 
+- Navrhnutý hlavný používateľský tok, obrazovky, potvrdenia, stavy a základ vizuálneho systému v [návrhu UX](ux-design.md).
+- Pripravený [klikateľný prototyp](../design/README.md) so simulovanými dátami a lokálnym náhľadom bez závislostí aplikácie.
+
 - Prečítaný pôvodný produktový koncept a nadväzujúca roadmapa.
 - Prázdny projekt prepojený s GitHubom; používateľ pridal testovací `test.md`.
 - Vytvorený prvý pracovný návrh špecifikácie MVP, výpočtových pravidiel a implementačných úloh.
@@ -43,8 +46,12 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Overenie
 
+- Pri kontrole prototypu prešlo 13 skupín interakčných scenárov v jsdom a 14 výpočtov kontrastu textu voči povrchu. Podrobnosti a obmedzenia sú v [kontrole prototypu](prototype-review.md).
+- Vizuálna kontrola v prehliadači nebola dokončená: dostupný prehliadač odmietol lokálny súbor. Rozloženie, systémová klávesnica a VoiceOver ešte vyžadujú overenie.
+- Node.js 24.21.0 a npm 11.19.0 sú dostupné. Aktívne sú iba Xcode Command Line Tools; plný Xcode nie je aktívny. Kompatibilita s budúcou verziou Expo ešte nebola overená.
+
 - Pred prípravou dokumentácie bol pracovný strom čistý a vetva sledovala `origin/main`.
-- Dokumentácia nepredstavuje fungujúcu aplikáciu ani spustené testy výpočtov.
+- Produkčné výpočtové jadro zatiaľ neexistuje; referenčné prípady v špecifikácii ešte nie sú automatizované doménové testy.
 - Overené lokálne odkazy v Markdown dokumentácii, ukončenia súborov a neprítomnosť nadbytočných medzier na konci riadkov.
 - Zatiaľ nebol vytvorený mobilný projekt, spustený simulátor, overený iPhone ani vykonaný build či nasadenie.
 
@@ -53,11 +60,11 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 - Overiť jednoduchosť formulára a zrozumiteľnosť plnej nádrže a medzier na prototype.
 - Pri dátovom modeli výslovne vyriešiť zachovanie medzier pri vymazaní a presune záznamov.
 - Overiť aktuálne verzie, kompatibilitu a prostredie pri zakladaní aplikácie.
-- Pri návrhu určiť vizuálny systém a konkrétne prezentácie obrazoviek.
+- Overiť navrhnutý vizuálny systém, úzke displeje a zväčšený text vizuálnou kontrolou a na zariadení.
 - Pred registráciou aplikácie určiť bundle ID a konfiguráciu podpisovania.
 - Pred verejným vydaním overiť názov, zvoliť licenciu repozitára a pripraviť informácie o súkromí.
 - Odhady roadmapy nie sú pevné termíny; beta závisí od reálnych intervalov tankovania.
 
 ## Ďalší krok
 
-Navrhnúť celý hlavný tok a obrazovky podľa špecifikácie vrátane stavov s nedostatkom údajov. Až potom začať implementáciu; dokumentácia sama nezakladá súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.
+Prejsť klikateľný návrh a získať spätnú väzbu, potom založiť Expo projekt s overenými verziami. Nakonfigurovať plný Xcode pred lokálnym iOS buildom. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.
