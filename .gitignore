@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Expo-generated local state and types
+.expo/
+/expo-env.d.ts
+
+# Build output and test coverage
+/dist/
+/web-build/
+/coverage/
+.nyc_output/
+*.tsbuildinfo
+
+# Local environment files; keep credential-free templates in Git
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Signing keys and private distribution credentials
+*.p8
+*.p12
+*.pfx
+*.key
+*.mobileprovision
+*.provisionprofile
+*.jks
+*.keystore
+/credentials.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# macOS and local editor files
+.DS_Store
+._*
+.idea/
+*.swp
+*.swo
+*~
+
+# Keep dependency lockfiles and shared editor settings versioned.
+# Native ios/ and android/ sources are not ignored here; decide how to
+# manage generated native projects when setting up the Expo application.

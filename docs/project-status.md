@@ -39,6 +39,7 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 - Prázdny projekt prepojený s GitHubom; používateľ pridal testovací `test.md`.
 - Vytvorený prvý pracovný návrh špecifikácie MVP, výpočtových pravidiel a implementačných úloh.
 - Pravidlá spolupráce vrátane automatických commitov uložené do koreňového `AGENTS.md`.
+- Pridaný `.gitignore` pre závislosti, Expo lokálne súbory, buildy, logy, lokálne `.env` a podpisovacie kľúče. Vzory `.env.example`, lockfiles a natívne zdrojové priečinky zostávajú verzovateľné.
 
 ## Overenie
 
