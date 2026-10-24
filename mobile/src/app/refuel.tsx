@@ -1,4 +1,4 @@
-import { Redirect, router, Stack, usePreventRemove } from 'expo-router';
+import { Redirect, router, Stack, useLocalSearchParams, usePreventRemove } from 'expo-router';
 import { useRef, useState, type ComponentRef } from 'react';
 import { AccessibilityInfo, Alert, Pressable, Switch, Text, TextInput, View } from 'react-native';
 import {
@@ -16,12 +16,14 @@ import {
 import {
   buildRefuel,
   centsFromUnitPrice,
+  draftFromRefuel,
+  gapAnchorsForEdit,
   isDate,
   localToday,
   parseScaled,
   ValidationError,
 } from '@/domain/fuel';
-import type { FieldErrors, RefuelDraft } from '@/domain/fuel';
+import type { FieldErrors, Refuel, RefuelDraft } from '@/domain/fuel';
 import { useFuel } from '@/state/fuel-store';
 
 function isoDate(value: string) {
@@ -32,17 +34,32 @@ function isoDate(value: string) {
 }
 
 export default function RefuelForm() {
-  const { vehicle, refuels, saveRefuel } = useFuel();
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { refuels } = useFuel();
+  const record = id === undefined ? undefined : refuels.find((item) => item.id === Number(id));
+  if (id !== undefined && !record) return <Redirect href="/history" />;
+  return <RefuelEditor key={record?.id ?? 'new'} record={record} />;
+}
+
+function RefuelEditor({ record }: { record?: Refuel }) {
+  const { vehicle, refuels, gaps, saveRefuel, editRefuel } = useFuel();
   const c = usePalette();
-  const [draft, setDraft] = useState<RefuelDraft>({
-    date: localToday().split('-').reverse().join('.'),
-    odometer: '',
-    liters: '',
-    price: '',
-    priceMode: 'amount',
-    full: false,
-    missed: false,
-  });
+  const [draft, setDraft] = useState<RefuelDraft>(() =>
+    record
+      ? {
+          ...draftFromRefuel(record),
+          date: record.date.split('-').reverse().join('.'),
+        }
+      : {
+          date: localToday().split('-').reverse().join('.'),
+          odometer: '',
+          liters: '',
+          price: '',
+          priceMode: 'amount',
+          full: false,
+          missed: false,
+        },
+  );
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
   const [more, setMore] = useState(false);
@@ -96,13 +113,22 @@ export default function RefuelForm() {
     setErrors({});
     setError('');
     try {
-      buildRefuel(input, refuels);
+      buildRefuel(
+        input,
+        refuels.filter((item) => item.id !== record?.id),
+      );
       writing.current = true;
       setBusy(true);
-      const id = await saveRefuel(input);
+      const id = record ? record.id : await saveRefuel(input);
+      if (record) await editRefuel(record.id, input);
       setDirty(false);
+      setBusy(false);
       disablePrevention();
-      router.replace({ pathname: '/saved', params: { id } });
+      if (record) router.dismissTo({ pathname: '/record', params: { id } });
+      else router.replace({ pathname: '/saved', params: { id } });
+      AccessibilityInfo.announceForAccessibility(
+        record ? 'Zmeny boli uložené.' : 'Tankovanie bolo uložené.',
+      );
     } catch (caught) {
       if (caught instanceof ValidationError) {
         setErrors(caught.errors);
@@ -132,16 +158,42 @@ export default function RefuelForm() {
         : 'Vypočítaná suma: ' + money(centsFromUnitPrice(liters, price));
   }
   const last = refuels.at(-1);
+  let movingGap = false;
+  if (record) {
+    try {
+      const updated = buildRefuel(
+        { ...draft, date: isoDate(draft.date) },
+        refuels.filter((item) => item.id !== record.id),
+      );
+      movingGap = gapAnchorsForEdit(record, updated, refuels, gaps).length > 0;
+    } catch {
+      /* Inline validation is shown on save. */
+    }
+  }
   return (
     <Page brand={false}>
       <Stack.Screen options={{ gestureEnabled: !busy }} />
       <TextButton
         title="Zrušiť"
+        disabled={busy}
         onPress={() => {
           if (!writing.current) router.canGoBack() ? router.back() : router.replace('/');
         }}
       />
-      <Heading title="Nové tankovanie" subtitle="Tri údaje z účtenky a palubnej dosky." />
+      <Heading
+        title={record ? 'Upraviť tankovanie' : 'Nové tankovanie'}
+        subtitle={
+          record
+            ? 'Oprav údaje podľa účtenky a palubnej dosky.'
+            : 'Tri údaje z účtenky a palubnej dosky.'
+        }
+      />
+      {movingGap ? (
+        <Copy small>
+          Presúvaš záznam pri neúplnej evidencii. Medzery zachováme aj pri pôvodnom a novom stave
+          tachometra; dotknuté úseky nezahrnieme do spotreby.
+        </Copy>
+      ) : null}
       <Field
         inputRef={odometerRef}
         label="Stav tachometra · km"
@@ -246,6 +298,7 @@ export default function RefuelForm() {
       </View>
       <TextButton
         title={more ? 'Skryť ďalšie možnosti ↑' : 'Dátum a ďalšie možnosti →'}
+        disabled={busy}
         onPress={() => {
           if (!busy) setMore((value) => !value);
         }}
@@ -279,6 +332,12 @@ export default function RefuelForm() {
               trackColor={{ false: c.line, true: c.green }}
             />
           </View>
+          {record && gaps.length > 0 ? (
+            <Copy small muted>
+              Existujúce medzery zostávajú zachované. Táto voľba pridá označenie chýbajúceho
+              tankovania; vypnutie voľby staršie medzery neodstráni.
+            </Copy>
+          ) : null}
         </>
       ) : (
         <Copy small muted>
@@ -286,7 +345,12 @@ export default function RefuelForm() {
         </Copy>
       )}
       {error ? <Copy error>{error}</Copy> : null}
-      <Button title="Uložiť tankovanie" onPress={save} busy={busy} testID="save-refuel" />
+      <Button
+        title={record ? 'Uložiť zmeny' : 'Uložiť tankovanie'}
+        onPress={save}
+        busy={busy}
+        testID="save-refuel"
+      />
     </Page>
   );
 }

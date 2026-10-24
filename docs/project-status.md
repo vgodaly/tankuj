@@ -35,6 +35,7 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Dokončené
 
+- Úprava tankovania so zachovaním ID a pôvodného režimu ceny; vymazanie s rozlíšením chyby a skutočného tankovania, dvojstupňovým potvrdením a transakčným zachovaním medzier. Prepočty vychádzajú z aktuálnej histórie. Existujúca SQLite schéma v1 sa nemení.
 - Prvý funkčný mobilný tok: úvod, prehľad, pridanie tankovania, potvrdenie, história, detail a základné štatistiky. UI používa návrh Tankuj a nezačína s demo údajmi.
 - Lokálne ukladanie vozidla, tankovaní a medzier do SQLite; presné centy, mililitre a jednotkové ceny. Výpočty a repository sú oddelené od UI.
 - Podrobnosti a aktuálne obmedzenia sú v [prvom mobilnom toku](mobile-first-flow.md).
@@ -66,14 +67,15 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 - Príčina predchádzajúcich timeoutov simctl openurl nie je potvrdená; aplikácia sa už zobrazila. V tomto kroku sa nemenila sieťová konfigurácia ani sa nemazali dáta simulátora.
 
 - Pred prípravou dokumentácie bol pracovný strom čistý a vetva sledovala `origin/main`.
-- Časť referenčných prípadov výpočtov už pokrývajú automatizované doménové testy; úpravy, vymazanie a zálohy ešte nie sú implementované.
+- Pri doplnení úprav a mazania prešlo všetkých 35 doménových a SQLite integračných testov. Pokrývajú opravy, oba dôvody mazania, prepočty, presuny pri medzerách, rollback aj zachovanie upravených údajov a medzery po vymazaní pri opätovnom otvorení databázového súboru. Zálohy a potvrdenie úplnosti konkrétnej medzery ešte nie sú implementované.
+- Samostatný simulátor Tankuj QA (iPhone 17, iOS 27.0, Expo Go) umožnil vytvoriť testovacie vozidlo a vyplniť formulár s náhľadom ceny. Úplný zápis, úprava, vymazanie cez mobilné UI a reštart s tankovaniami zostávajú neoverené pre opakované chyby ovládania okna Device Hub; podrobnosti sú v mobile-first-flow.md. Do pôvodnej používateľovej evidencie sa testovacie tankovania nevkladali.
 - Overené lokálne odkazy v Markdown dokumentácii, ukončenia súborov a neprítomnosť nadbytočných medzier na konci riadkov.
 - Natívny build, test na fyzickom zariadení a nasadenie ešte neprebehli.
 
 ## Otvorené body a riziká
 
 - Overiť jednoduchosť formulára a zrozumiteľnosť plnej nádrže a medzier na prototype.
-- Pri dátovom modeli výslovne vyriešiť zachovanie medzier pri vymazaní a presune záznamov.
+- Zachovanie medzier pri vymazaní a presune je implementované konzervatívnymi bodmi tachometra. Doplniť rozhranie na výslovné potvrdenie úplnosti konkrétneho úseku; samotná oprava alebo doplnenie záznamu medzeru neodstráni.
 - Skontrolovať kompatibilitu vytvorenej šablóny a päť závažných nálezov npm audit hlásených pri inštalácii. Nespúšťať automaticky npm audit fix --force.
 - Overiť navrhnutý vizuálny systém, úzke displeje a zväčšený text vizuálnou kontrolou a na zariadení.
 - Pred registráciou aplikácie určiť bundle ID a konfiguráciu podpisovania.
@@ -82,4 +84,4 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Ďalší krok
 
-Manuálne overiť zápis tankovaní a zachovanie po reštarte, doplniť úpravy/vymazanie so zachovaním medzier a export/obnovu. Skontrolovať nálezy npm audit pred širšou betou. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.
+Dokončiť manuálne overenie mobilných tokov a zachovania po reštarte, doplniť export/obnovu a potvrdenie úplnosti konkrétnej medzery. Skontrolovať nálezy npm audit pred širšou betou. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.

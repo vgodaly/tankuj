@@ -5,11 +5,13 @@ import type { ReactNode } from 'react';
 
 import {
   createVehicle,
+  deleteRefuel,
   initializeDatabase,
   insertRefuel,
   readSnapshot,
+  updateRefuel,
 } from '@/data/fuel-repository';
-import type { RefuelDraft, Snapshot, Vehicle } from '@/domain/fuel';
+import type { DeleteReason, RefuelDraft, Snapshot, Vehicle } from '@/domain/fuel';
 
 let connection: Promise<SQLiteDatabase> | null = null;
 function database() {
@@ -33,6 +35,8 @@ type FuelStore = Snapshot & {
   retry: () => void;
   saveVehicle: (vehicle: Vehicle) => Promise<void>;
   saveRefuel: (draft: RefuelDraft) => Promise<number>;
+  editRefuel: (id: number, draft: RefuelDraft) => Promise<void>;
+  removeRefuel: (id: number, reason: DeleteReason) => Promise<void>;
 };
 const FuelContext = createContext<FuelStore | null>(null);
 const EMPTY: Snapshot = { vehicle: null, refuels: [], gaps: [] };
@@ -85,6 +89,24 @@ export function FuelProvider({ children }: { children: ReactNode }) {
       writing.current = false;
     }
   }, []);
+  const editRefuel = useCallback(async (id: number, draft: RefuelDraft) => {
+    if (writing.current) throw new Error('Ukladanie už prebieha.');
+    writing.current = true;
+    try {
+      setSnapshot(await updateRefuel(await database(), id, draft));
+    } finally {
+      writing.current = false;
+    }
+  }, []);
+  const removeRefuel = useCallback(async (id: number, reason: DeleteReason) => {
+    if (writing.current) throw new Error('Ukladanie už prebieha.');
+    writing.current = true;
+    try {
+      setSnapshot(await deleteRefuel(await database(), id, reason));
+    } finally {
+      writing.current = false;
+    }
+  }, []);
   return (
     <FuelContext
       value={{
@@ -94,6 +116,8 @@ export function FuelProvider({ children }: { children: ReactNode }) {
         retry: () => setAttempt((value) => value + 1),
         saveVehicle,
         saveRefuel,
+        editRefuel,
+        removeRefuel,
       }}
     >
       {children}

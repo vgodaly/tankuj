@@ -34,8 +34,8 @@ export default function Settings() {
       </Card>
       <SectionTitle>Prvá vývojová verzia</SectionTitle>
       <Copy small muted>
-        Údaje sa ukladajú lokálne v tomto telefóne. Export, obnova zálohy a úpravy záznamov ešte nie
-        sú dostupné. Túto verziu zatiaľ používaj na skúšanie, nie ako jedinú kópiu svojej histórie.
+        Údaje sa ukladajú lokálne v tomto telefóne. Export a obnova zálohy ešte nie sú dostupné.
+        Túto verziu zatiaľ používaj na skúšanie, nie ako jedinú kópiu svojej histórie.
       </Copy>
     </Page>
   );

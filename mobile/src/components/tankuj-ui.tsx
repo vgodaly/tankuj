@@ -190,15 +190,36 @@ export function Button({
     </Pressable>
   );
 }
-export function TextButton({ title, onPress }: { title: string; onPress: () => void }) {
+export function TextButton({
+  title,
+  onPress,
+  disabled = false,
+  destructive = false,
+}: {
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+  destructive?: boolean;
+}) {
   const c = usePalette();
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       style={{ minHeight: 44, justifyContent: 'center', paddingVertical: 8 }}
     >
-      <Text style={{ color: c.green, fontSize: 15, fontWeight: '500' }}>{title}</Text>
+      <Text
+        style={{
+          color: destructive ? c.error : c.green,
+          fontSize: 15,
+          fontWeight: '500',
+          opacity: disabled ? 0.6 : 1,
+        }}
+      >
+        {title}
+      </Text>
     </Pressable>
   );
 }

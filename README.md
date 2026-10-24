@@ -6,7 +6,7 @@ Mobilná aplikácia na rýchlu evidenciu tankovaní a porozumenie nákladom na p
 
 ## Stav projektu
 
-Pripravujeme MVP. V [mobile/](mobile/README.md) je prvá funkčná vývojová verzia Tankuj: nastavenie auta, pridanie tankovania, história a základné štatistiky s lokálnym ukladaním do SQLite. Rozsah a hranice overenia opisuje [prvý mobilný tok](docs/mobile-first-flow.md).
+Pripravujeme MVP. V [mobile/](mobile/README.md) je funkčná vývojová verzia Tankuj: nastavenie auta, pridanie, úprava a vymazanie tankovania, história a základné štatistiky s lokálnym ukladaním do SQLite. Rozsah a hranice overenia opisuje [prvý mobilný tok](docs/mobile-first-flow.md).
 
 Základ používa Expo SDK 58, React Native 0.88, React 19.3, TypeScript 6 a expo-sqlite. Pre vývoj a testy používame Node.js 24.
 

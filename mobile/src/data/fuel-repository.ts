@@ -1,6 +1,13 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-import { buildRefuel, localToday } from '../domain/fuel.ts';
-import type { CoverageGap, Refuel, RefuelDraft, Snapshot, Vehicle } from '../domain/fuel.ts';
+import { buildRefuel, gapAnchorsForEdit, localToday } from '../domain/fuel.ts';
+import type {
+  CoverageGap,
+  DeleteReason,
+  Refuel,
+  RefuelDraft,
+  Snapshot,
+  Vehicle,
+} from '../domain/fuel.ts';
 
 type Db = Pick<
   SQLiteDatabase,
@@ -84,6 +91,63 @@ export async function insertRefuel(
         record.odometerKm,
       );
     result = { snapshot: await readSnapshot(transaction), id: write.lastInsertRowId };
+  });
+  return result!;
+}
+
+async function addGap(db: Pick<Db, 'runAsync'>, odometerKm: number) {
+  await db.runAsync(
+    'INSERT INTO coverage_gaps (at_odometer_km) SELECT ? WHERE NOT EXISTS (SELECT 1 FROM coverage_gaps WHERE at_odometer_km = ?)',
+    odometerKm,
+    odometerKm,
+  );
+}
+
+export async function updateRefuel(
+  db: Db,
+  id: number,
+  draft: RefuelDraft,
+  today = localToday(),
+): Promise<Snapshot> {
+  let result: Snapshot | undefined;
+  await db.withExclusiveTransactionAsync(async (transaction) => {
+    const before = await readSnapshot(transaction);
+    const original = before.refuels.find((record) => record.id === id);
+    if (!original) throw new Error('Tankovanie už neexistuje.');
+    const record = buildRefuel(
+      draft,
+      before.refuels.filter((item) => item.id !== id),
+      today,
+    );
+    await transaction.runAsync(
+      'UPDATE refuels SET date = ?, odometer_km = ?, volume_ml = ?, amount_cents = ?, is_full = ?, price_mode = ?, unit_price_milli = ? WHERE id = ?',
+      record.date,
+      record.odometerKm,
+      record.volumeMl,
+      record.amountCents,
+      Number(record.full),
+      record.priceMode,
+      record.unitPriceMilli,
+      id,
+    );
+    const anchors = gapAnchorsForEdit(original, record, before.refuels, before.gaps);
+    if (draft.missed) anchors.push(record.odometerKm);
+    for (const anchor of new Set(anchors)) await addGap(transaction, anchor);
+    result = await readSnapshot(transaction);
+  });
+  return result!;
+}
+
+export async function deleteRefuel(db: Db, id: number, reason: DeleteReason): Promise<Snapshot> {
+  if (reason !== 'incorrect' && reason !== 'real') throw new Error('Vyber dôvod vymazania.');
+  let result: Snapshot | undefined;
+  await db.withExclusiveTransactionAsync(async (transaction) => {
+    const before = await readSnapshot(transaction);
+    const record = before.refuels.find((item) => item.id === id);
+    if (!record) throw new Error('Tankovanie už neexistuje.');
+    await transaction.runAsync('DELETE FROM refuels WHERE id = ?', id);
+    if (reason === 'real') await addGap(transaction, record.odometerKm);
+    result = await readSnapshot(transaction);
   });
   return result!;
 }

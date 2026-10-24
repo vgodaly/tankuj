@@ -21,6 +21,52 @@ export type RefuelDraft = {
   full: boolean;
   missed: boolean;
 };
+export type DeleteReason = 'incorrect' | 'real';
+
+// Preserve entered precision without locale grouping or a rounded effective price.
+export function draftFromRefuel(record: Refuel): RefuelDraft {
+  const decimal = (value: number, places: number) => {
+    const digits = String(value).padStart(places + 1, '0');
+    return digits.slice(0, -places) + '.' + digits.slice(-places);
+  };
+  return {
+    date: record.date,
+    odometer: String(record.odometerKm),
+    liters: decimal(record.volumeMl, 3),
+    price:
+      record.priceMode === 'unit'
+        ? decimal(record.unitPriceMilli!, 3)
+        : decimal(record.amountCents, 2),
+    priceMode: record.priceMode,
+    full: record.full,
+    missed: false,
+  };
+}
+
+// A gap has no record ownership in schema v1. Retain every old anchor and, when
+// moving a neighboring boundary, conservatively mark both old and new positions.
+export function gapAnchorsForEdit(
+  original: Refuel,
+  updated: Omit<Refuel, 'id'>,
+  refuels: readonly Refuel[],
+  gaps: readonly CoverageGap[],
+): number[] {
+  if (original.odometerKm === updated.odometerKm) return [];
+  const others = refuels.filter((record) => record.id !== original.id);
+  const low = Math.min(original.odometerKm, updated.odometerKm);
+  const high = Math.max(original.odometerKm, updated.odometerKm);
+  const previous = others.reduce(
+    (value, r) => (r.odometerKm < low ? Math.max(value, r.odometerKm) : value),
+    -1,
+  );
+  const next = others.reduce(
+    (value, r) => (r.odometerKm > high ? Math.min(value, r.odometerKm) : value),
+    Infinity,
+  );
+  return gaps.some((gap) => gap.atOdometerKm > previous && gap.atOdometerKm <= next)
+    ? [...new Set([original.odometerKm, updated.odometerKm])]
+    : [];
+}
 export type FieldErrors = Partial<Record<'date' | 'odometer' | 'liters' | 'price', string>>;
 export class ValidationError extends Error {
   errors: FieldErrors;
