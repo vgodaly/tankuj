@@ -36,6 +36,8 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 ## Dokončené
 
 - Používateľ vytvoril Expo projekt v priečinku mobile a spustil Metro server.
+- Mobilná šablóna vrátane package-lock.json, zdrojov, konfigurácie a pôvodných assetov je zaradená do hlavného Git repozitára. Závislosti node_modules a lokálne dáta .expo sú ignorované.
+- Opravená typová nekompatibilita ref v prevzatom webovom TabButton: typ ref sa odvodzuje priamo od komponentu Pressable.
 - Plný Xcode je aktívny. Agent v Device Hub prepol zobrazenie na klasický iPhone 17 a zavrel nápovedu a vývojové menu Expo Go; následne overil obrazovku „Welcome to Expo“.
 - Navrhnutý hlavný používateľský tok, obrazovky, potvrdenia, stavy a základ vizuálneho systému v [návrhu UX](ux-design.md).
 - Pripravený [klikateľný prototyp](../design/README.md) so simulovanými dátami a lokálnym náhľadom bez závislostí aplikácie.
@@ -53,6 +55,8 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 - Node.js 24.21.0 a npm 11.19.0 sú dostupné. Aktívny Xcode 27.1, build 27A9275, bol overený cez xcodebuild.
 - Dňa 24. 10. 2026 overená odpoveď Metro servera na /status a nainštalované Expo Go 58.0.7 na iPhone 17 s iOS 27.0. iPhone Duo s iOS 27.1 je vypnutý.
 - Spustenie predvolenej aplikácie overené v simulátore pomocou zobrazenia Device Hub a prístupnostného stromu. Toto nie je lokálny natívny build ani overenie na fyzickom iPhone.
+- Pred commitom mobilnej šablóny prešla typová kontrola tsc --noEmit. Overené ignorovanie lokálnych priečinkov, zhoda závislostí v package.json a lockfile, JSON syntax a vybrané vzory prihlasovacích údajov vo verzovaných súboroch.
+- Lint zatiaľ nie je nakonfigurovaný. Offline kontrola expo install --check nevypísala nezhody, ale sama upozorňuje na obmedzenú spoľahlivosť offline validácie; nenahrádza úplnú kontrolu závislostí a npm audit.
 - Príčina predchádzajúcich timeoutov simctl openurl nie je potvrdená; aplikácia sa už zobrazila. V tomto kroku sa nemenila sieťová konfigurácia ani sa nemazali dáta simulátora.
 
 - Pred prípravou dokumentácie bol pracovný strom čistý a vetva sledovala `origin/main`.
