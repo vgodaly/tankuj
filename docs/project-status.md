@@ -2,6 +2,15 @@
 
 Posledná aktualizácia: 24. 10. 2026.
 
+## Pozastavenie vývoja
+
+- Vývoj je na výslovnú žiadosť používateľa pozastavený do prechodu na nový počítač. Dôvodom je výrazné spomaľovanie aktuálneho Macu pri iOS simulátore.
+- Bez nového pokynu nepokračovať v implementácii ani v testovaní. Najbližší krok nižšie je pripravený až na obnovenie práce.
+- Pred pozastavením bol pracovný strom čistý a main zhodný s origin/main; implementácia vrátane úprav a mazania tankovaní je pushnutá. Poznámka o pozastavení vzniká v samostatnom lokálnom commite, push zostáva na používateľovi.
+- Pri ukončení boli vypnuté oba simulátory iPhone 17 a Tankuj QA a lokálny Expo/Metro server. Overené: žiadny bežiaci simulátor, port 8081 bez servera a pôvodné procesy Expo ukončené; náhľad prototypu na porte 8765 nebežal. Device Hub a Xcode boli ukončené bežnou voľbou Quit a následne overené ako nebežiace. Projekt, závislosti a dáta simulátorov sa nemažú.
+- Manuálne overenie celého mobilného toku zostáva otvorené. Posledná úspešná kontrola kódu: TypeScript a 35 doménových/SQLite testov; pri pozastavení sa náročné testy znovu nespúšťajú.
+- Pri prechode na nový počítač nezamieňať Git zálohu zdrojov so zálohou údajov aplikácie: lokálna SQLite databáza simulátora nie je v Gite. Export/obnova zatiaľ nie sú implementované; prípadný prenos skúšobnej histórie treba riešiť osobitne.
+
 ## Cieľ
 
 Pomôcť vodičovi rýchlo zapisovať tankovania, dôverovať vypočítanej spotrebe a postupne porozumieť vývoju nákladov. Prioritou je nízke úsilie pri zadávaní a návrat pri ďalšom tankovaní.
