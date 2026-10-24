@@ -6,9 +6,9 @@ Mobilná aplikácia na rýchlu evidenciu tankovaní a porozumenie nákladom na p
 
 ## Stav projektu
 
-Pripravujeme MVP. Repozitár obsahuje produktovú dokumentáciu, klikateľný návrh a základ mobilnej aplikácie v [mobile/](mobile/README.md). Predvolená Expo aplikácia bola spustená v iOS simulátore; funkcie Tankuj ešte nie sú implementované.
+Pripravujeme MVP. V [mobile/](mobile/README.md) je prvá funkčná vývojová verzia Tankuj: nastavenie auta, pridanie tankovania, história a základné štatistiky s lokálnym ukladaním do SQLite. Rozsah a hranice overenia opisuje [prvý mobilný tok](docs/mobile-first-flow.md).
 
-Základ používa Expo SDK 58, React Native 0.88, React 19.3 a TypeScript 6. Lokálna SQLite databáza je plánovaná súčasť MVP.
+Základ používa Expo SDK 58, React Native 0.88, React 19.3, TypeScript 6 a expo-sqlite. Pre vývoj a testy používame Node.js 24.
 
 ## Spustenie mobilnej aplikácie
 
@@ -23,7 +23,8 @@ npm start
 V ponuke Expo vyber iOS simulátor klávesmi Shift + i. Typová kontrola v priečinku mobile:
 
 ~~~bash
-npx tsc --noEmit
+npm run typecheck
+npm test
 ~~~
 
 Pôvodné licenčné oznámenie prevzatej Expo šablóny je zachované v [mobile/LICENSE](mobile/LICENSE). Licencia vlastného projektu Tankuj zatiaľ nebola zvolená.

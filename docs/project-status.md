@@ -22,7 +22,7 @@ Pomôcť vodičovi rýchlo zapisovať tankovania, dôverovať vypočítanej spot
 | Názov | Tankuj, repo `tankuj` | Nadväzuje na produktový koncept |
 | Platformy | Najprv iOS, neskôr Android | Výslovná preferencia používateľa; má Apple Developer Program |
 | Stack | Expo SDK 58, React Native 0.88, React 19.3, TypeScript 6 | Používateľ založil predvolenú Expo šablónu v priečinku mobile |
-| Ukladanie | Lokálna SQLite, bez backendu | Offline prevádzka a jednoduchší prvý rozsah |
+| Ukladanie | Lokálna SQLite cez expo-sqlite 58, bez backendu | Offline prevádzka a jednoduchší prvý rozsah |
 | Účet | Bez registrácie | Nízka bariéra prvého použitia |
 | MVP | Jedno auto, benzín/diesel, km/l/EUR | Pracovný predpoklad na obmedzenie rozsahu |
 | Presnosť | Metóda medzi plnými nádržami, explicitné medzery | Dôveryhodnosť výsledkov |
@@ -31,9 +31,13 @@ Pomôcť vodičovi rýchlo zapisovať tankovania, dôverovať vypočítanej spot
 | Analytika produktu | Najprv pozorovanie a spätná väzba | Nepridávať telemetriu bez konkrétnej potreby |
 | Monetizácia | Bez platieb a reklám v prvej bete | Najprv overenie užitočnosti a návratov |
 
-Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných predpokladov; nejde o tvrdenie, že používateľ osobitne schválil každý detail. Verzie stacku vychádzajú z vytvorenej šablóny; produkčné kontroly závislostí ešte neprebehli. Doménová architektúra a schéma databázy ešte nie sú implementované. Názov a slug aplikácie sú zatiaľ predvolené mobile; vlastný bundle ID ešte nie je nastavený.
+Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných predpokladov; nejde o tvrdenie, že používateľ osobitne schválil každý detail. Verzie stacku vychádzajú z vytvorenej šablóny. Prvé doménové jadro a SQLite schéma sú implementované; úplná kontrola závislostí a npm audit ostáva otvorená. Názov a slug aplikácie sú Tankuj/tankuj; interná schéma odkazu zostáva mobile a vlastný bundle ID ešte nie je nastavený.
 
 ## Dokončené
+
+- Prvý funkčný mobilný tok: úvod, prehľad, pridanie tankovania, potvrdenie, história, detail a základné štatistiky. UI používa návrh Tankuj a nezačína s demo údajmi.
+- Lokálne ukladanie vozidla, tankovaní a medzier do SQLite; presné centy, mililitre a jednotkové ceny. Výpočty a repository sú oddelené od UI.
+- Podrobnosti a aktuálne obmedzenia sú v [prvom mobilnom toku](mobile-first-flow.md).
 
 - Používateľ vytvoril Expo projekt v priečinku mobile a spustil Metro server.
 - Mobilná šablóna vrátane package-lock.json, zdrojov, konfigurácie a pôvodných assetov je zaradená do hlavného Git repozitára. Závislosti node_modules a lokálne dáta .expo sú ignorované.
@@ -55,14 +59,16 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 - Node.js 24.21.0 a npm 11.19.0 sú dostupné. Aktívny Xcode 27.1, build 27A9275, bol overený cez xcodebuild.
 - Dňa 24. 10. 2026 overená odpoveď Metro servera na /status a nainštalované Expo Go 58.0.7 na iPhone 17 s iOS 27.0. iPhone Duo s iOS 27.1 je vypnutý.
 - Spustenie predvolenej aplikácie overené v simulátore pomocou zobrazenia Device Hub a prístupnostného stromu. Toto nie je lokálny natívny build ani overenie na fyzickom iPhone.
+- Po prenose UI vizuálne overená skutočná úvodná obrazovka Tankuj na iPhone 17 v Expo Go. Bez vloženia testovacích tankovaní do používateľovej histórie.
+- Pre prvý funkčný tok prešla typová kontrola a všetkých 23 doménových a SQLite integračných testov vrátane rollbacku a opätovného otvorenia databázového súboru. Natívny zápis z formulára a reštart s údajmi ešte neboli manuálne overené.
 - Pred commitom mobilnej šablóny prešla typová kontrola tsc --noEmit. Overené ignorovanie lokálnych priečinkov, zhoda závislostí v package.json a lockfile, JSON syntax a vybrané vzory prihlasovacích údajov vo verzovaných súboroch.
 - Lint zatiaľ nie je nakonfigurovaný. Offline kontrola expo install --check nevypísala nezhody, ale sama upozorňuje na obmedzenú spoľahlivosť offline validácie; nenahrádza úplnú kontrolu závislostí a npm audit.
 - Príčina predchádzajúcich timeoutov simctl openurl nie je potvrdená; aplikácia sa už zobrazila. V tomto kroku sa nemenila sieťová konfigurácia ani sa nemazali dáta simulátora.
 
 - Pred prípravou dokumentácie bol pracovný strom čistý a vetva sledovala `origin/main`.
-- Produkčné výpočtové jadro zatiaľ neexistuje; referenčné prípady v špecifikácii ešte nie sú automatizované doménové testy.
+- Časť referenčných prípadov výpočtov už pokrývajú automatizované doménové testy; úpravy, vymazanie a zálohy ešte nie sú implementované.
 - Overené lokálne odkazy v Markdown dokumentácii, ukončenia súborov a neprítomnosť nadbytočných medzier na konci riadkov.
-- Natívny build, produkčné doménové testy, test na fyzickom zariadení a nasadenie ešte neprebehli.
+- Natívny build, test na fyzickom zariadení a nasadenie ešte neprebehli.
 
 ## Otvorené body a riziká
 
@@ -76,4 +82,4 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Ďalší krok
 
-Skontrolovať vytvorený mobilný projekt a závislosti, potom preniesť odsúhlasený návrh UI a implementovať prvý funkčný tok tankovania. Pri významných úpravách overiť typy, relevantné testy a správanie v simulátore. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.
+Manuálne overiť zápis tankovaní a zachovanie po reštarte, doplniť úpravy/vymazanie so zachovaním medzier a export/obnovu. Skontrolovať nálezy npm audit pred širšou betou. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.

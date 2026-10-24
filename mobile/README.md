@@ -1,56 +1,40 @@
-# Welcome to your Expo app 👋
+# Tankuj — mobilná aplikácia
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Prvá vývojová verzia pre iOS; základ je spoločný aj pre Android. Používa Expo SDK 58, React Native, TypeScript a lokálnu SQLite databázu. Na vývoj a testy používame Node.js 24.
 
-## Get started
+## Spustenie
 
-1. Install dependencies
+V tomto priečinku:
 
-   ```bash
-   npm install
-   ```
+~~~bash
+npm ci
+npm start
+~~~
 
-2. Start the app
+V ponuke Expo stlač Shift + i a vyber klasický iPhone. Po prvom otvorení vyber palivo a voliteľne pomenuj auto. Aplikácia nemá predvyplnené demo tankovania.
 
-   ```bash
-   npx expo start
-   ```
+## Kontroly
 
-In the output, you'll find options to open the app in a
+~~~bash
+npm run typecheck
+npm test
+~~~
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Testy používajú vstavaný test runner a SQLite v Node.js. Nevyžadujú simulátor a nemenia databázu aplikácie. Lint zatiaľ nie je nakonfigurovaný.
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Štruktúra
 
-## Get a fresh project
+- src/app: obrazovky a navigácia cez Expo Router.
+- src/components/tankuj-ui.tsx: spoločné komponenty a farby.
+- src/domain/fuel.ts: presné vstupy a výpočty bez závislosti od UI.
+- src/data/fuel-repository.ts: SQL schéma, migrácia a transakcie.
+- src/state/fuel-store.tsx: lokálny stav a prepojenie na SQLite.
+- tests: doménové a integračné testy repository.
 
-When you're ready, run:
+## Rozsah a obmedzenia
 
-```bash
-npm run reset-project
-```
+Funguje nastavenie auta, pridanie tankovania, prehľad, história, detail a základné štatistiky. Úpravy, vymazanie, grafy a export/obnova zálohy zatiaľ nie sú implementované. Túto verziu používaj na vývoj a skúšanie; zatiaľ nemá byť jedinou kópiou skutočnej histórie.
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Podrobnosti sú v [prvom funkčnom toku](../docs/mobile-first-flow.md), [špecifikácii MVP](../docs/mvp.md) a [pravidlách výpočtov](../docs/calculations.md).
 
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Pôvodné licenčné oznámenie prevzatej Expo šablóny je zachované v súbore LICENSE. Licencia vlastného projektu Tankuj zatiaľ nebola zvolená.

@@ -1,18 +1,53 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Button, Copy, Heading, Page, usePalette } from '@/components/tankuj-ui';
+import { FuelProvider, useFuel } from '@/state/fuel-store';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export const unstable_settings = { initialRouteName: 'index' };
 
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+function AppContent() {
+  const { loading, error, retry } = useFuel();
+  const c = usePalette();
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+  if (loading)
+    return (
+      <Page brand={false}>
+        <Heading title="tankuj." subtitle="Načítavame tvoju históriu." />
+        <ActivityIndicator color={c.green} accessibilityLabel="Načítavanie" />
+      </Page>
+    );
+  if (error)
+    return (
+      <Page brand={false}>
+        <Heading title="Údaje sa nepodarilo načítať" />
+        <Copy>{error}</Copy>
+        <Button title="Skúsiť znova" onPress={retry} />
+      </Page>
+    );
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+        contentStyle: { backgroundColor: c.background },
+      }}
+    />
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <SafeAreaProvider>
+      <FuelProvider>
+        <StatusBar style="auto" />
+        <AppContent />
+      </FuelProvider>
+    </SafeAreaProvider>
   );
 }
