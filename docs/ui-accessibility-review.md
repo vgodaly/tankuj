@@ -37,4 +37,6 @@ Prešli typová kontrola, existujúcich 63 doménových/SQLite testov a iOS JS/H
 
 Prístupnostný strom potvrdzuje názvy a niektoré stavy, nie kvalitu hovorených oznamov, poradie gest a presun fokusu VoiceOver. Prechodný stav tlačidla počas zápisu je skontrolovaný v kóde; nebol cielene spomalený na UI skúšku. Natívny build, fyzický iPhone a Android sa týmto krokom neoverovali.
 
-Zostáva kontrola šírky 320 bodov, celej aplikácie a formulára pri najväčšom texte, veľkých čísel, VoiceOver gest, návratu gestom, fokusu po navigácii a oznamov pri chybách súborov. Pri úprave staršieho tankovania formulár zatiaľ uvádza iba posledný záznam; kontext časových susedov zostáva ďalším vylepšením podľa návrhu UX. Hlavný tok uloženia, mazania a súborových operácií už má samostatné overenia v projektovom stave.
+Následná [kontrola úzkeho rozloženia](responsive-layout-review.md) doplnila prispôsobenie veľkých súm a nadpisov, voľby a prepínače pod sebou pri veľkom texte a skúšku klávesnice na iPhone 13 mini. Rozlišuje dočasný obsah so šírkou 320 bodov od natívneho rozmeru zariadenia.
+
+Zostáva celý tok pri šírke 320 bodov, celá aplikácia pri najväčšom texte, VoiceOver gestá, návrat gestom, fokus po navigácii a oznamy pri chybách súborov. Pri úprave staršieho tankovania formulár zatiaľ uvádza iba posledný záznam; kontext časových susedov zostáva ďalším vylepšením podľa návrhu UX. Hlavný tok uloženia, mazania a súborových operácií už má samostatné overenia v projektovom stave.

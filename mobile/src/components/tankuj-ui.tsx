@@ -89,6 +89,8 @@ export function Heading({ title, subtitle }: { title: string; subtitle?: string 
       <Text
         accessibilityRole="header"
         maxFontSizeMultiplier={2}
+        numberOfLines={2}
+        adjustsFontSizeToFit
         style={{
           color: c.text,
           fontSize: 32,
@@ -241,6 +243,8 @@ export function Amount({
   return (
     <Text
       accessibilityLabel={accessibilityLabel}
+      numberOfLines={1}
+      adjustsFontSizeToFit
       style={{
         color: c.text,
         fontSize: 40,

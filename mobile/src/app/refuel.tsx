@@ -1,6 +1,8 @@
 import { Redirect, router, Stack, useLocalSearchParams, usePreventRemove } from 'expo-router';
 import { useRef, useState, type ComponentRef } from 'react';
-import { AccessibilityInfo, Alert, Pressable, Switch, Text, TextInput, View } from 'react-native';
+import {
+  AccessibilityInfo, Alert, Pressable, Switch, Text, TextInput, useWindowDimensions, View,
+} from 'react-native';
 import {
   Button,
   Copy,
@@ -44,6 +46,8 @@ export default function RefuelForm() {
 function RefuelEditor({ record }: { record?: Refuel }) {
   const { vehicle, refuels, gaps, saveRefuel, editRefuel } = useFuel();
   const c = usePalette();
+  const { fontScale } = useWindowDimensions();
+  const largeText = fontScale > 1.5;
   const [draft, setDraft] = useState<RefuelDraft>(() =>
     record
       ? {
@@ -224,7 +228,7 @@ function RefuelEditor({ record }: { record?: Refuel }) {
         <Copy small>Čo zadáš z účtenky?</Copy>
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: largeText ? 'column' : 'row',
             padding: 4,
             gap: 4,
             backgroundColor: c.soft,
@@ -241,10 +245,11 @@ function RefuelEditor({ record }: { record?: Refuel }) {
               key={item.mode}
               disabled={busy}
               accessibilityRole="radio"
+              accessibilityLabel={item.title}
               accessibilityState={{ checked: draft.priceMode === item.mode, disabled: busy }}
               onPress={() => changeMode(item.mode)}
               style={{
-                flex: 1,
+                flex: largeText ? undefined : 1,
                 minHeight: 46,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -258,6 +263,7 @@ function RefuelEditor({ record }: { record?: Refuel }) {
                   color: draft.priceMode === item.mode ? c.text : c.muted,
                   fontWeight: '500',
                   fontSize: 15,
+                  textAlign: 'center',
                 }}
               >
                 {item.title}
@@ -281,8 +287,11 @@ function RefuelEditor({ record }: { record?: Refuel }) {
           {preview}
         </Copy>
       ) : null}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-        <View style={{ flex: 1, gap: 4 }}>
+      <View style={{
+        flexDirection: largeText ? 'column' : 'row',
+        alignItems: largeText ? 'flex-start' : 'center', gap: 16,
+      }}>
+        <View style={{ flex: largeText ? undefined : 1, gap: 4 }}>
           <Copy>Do plnej nádrže</Copy>
           <Copy small muted>
             Plná nádrž nám pomáha merať spotrebu.
@@ -317,8 +326,11 @@ function RefuelEditor({ record }: { record?: Refuel }) {
             editable={!busy}
             error={errors.date}
           />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-            <View style={{ flex: 1, gap: 4 }}>
+          <View style={{
+            flexDirection: largeText ? 'column' : 'row',
+            alignItems: largeText ? 'flex-start' : 'center', gap: 16,
+          }}>
+            <View style={{ flex: largeText ? undefined : 1, gap: 4 }}>
               <Copy>Vynechal som tankovanie</Copy>
               <Copy small muted>
                 Od predchádzajúceho záznamu niektoré tankovanie chýba. Tento úsek nezahrnieme do

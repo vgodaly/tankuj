@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, useWindowDimensions, View } from 'react-native';
 import {
   Amount,
   Button,
@@ -23,6 +23,8 @@ import { useFuel } from '@/state/fuel-store';
 
 function Onboarding() {
   const c = usePalette();
+  const { fontScale } = useWindowDimensions();
+  const largeText = fontScale > 1.5;
   const { saveVehicle } = useFuel();
   const [fuel, setFuel] = useState<FuelType>('Benzín');
   const [name, setName] = useState('');
@@ -47,6 +49,8 @@ function Onboarding() {
     <Page brand={false}>
       <Text
         accessibilityLabel="Tankuj"
+        numberOfLines={1}
+        adjustsFontSizeToFit
         style={{
           color: c.green,
           fontSize: 52,
@@ -64,16 +68,17 @@ function Onboarding() {
       <Copy muted>Bez účtu. Funguje aj bez internetu.</Copy>
       <View style={{ gap: 10 }}>
         <SectionTitle>Na čo jazdíš?</SectionTitle>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flexDirection: largeText ? 'column' : 'row', gap: 10 }}>
           {(['Benzín', 'Diesel'] as const).map((value) => (
             <Pressable
               key={value}
               disabled={busy}
               accessibilityRole="radio"
+              accessibilityLabel={value}
               accessibilityState={{ checked: value === fuel, disabled: busy }}
               onPress={() => setFuel(value)}
               style={{
-                flex: 1,
+                flex: largeText ? undefined : 1,
                 backgroundColor: fuel === value ? c.green : c.paper,
                 padding: 16,
                 borderRadius: 14,

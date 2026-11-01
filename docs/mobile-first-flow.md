@@ -13,7 +13,7 @@ Stav k 1. 11. 2026: prvá vývojová verzia Tankuj, nie dokončené MVP ani verz
 - Úprava z detailu v rovnakom formulári: pôvodná suma alebo zadaná jednotková cena, litre, tachometer, dátum a plná nádrž; ID sa nemení. Kontrola chronológie vynechá iba práve upravovaný záznam.
 - Vymazanie z detailu: výber chybného/duplicitného záznamu alebo skutočného tankovania, potom potvrdenie s dátumom, tachometrom a sumou. Skutočné tankovanie po odstránení zanechá medzeru. Vymazanie zatiaľ nemá funkciu späť.
 - [Potvrdenie úplnosti konkrétneho úseku](coverage-completion.md) zo štatistík: pomenované hranice, konečné potvrdenie, atomické odstránenie iba vybraných medzier a prepočet. Otvorené úseky vyžadujú doplnenie ohraničujúcich tankovaní.
-- Svetlý a tmavý farebný základ podľa návrhu; klávesnicou posúvateľný formulár. Pri veľkom systémovom texte sa navigácia usporiada pod seba; hlavný nadpis a značka majú najviac dvojnásobné zväčšenie, ostatný text zachováva systémovú mierku.
+- Svetlý a tmavý farebný základ podľa návrhu; klávesnicou posúvateľný formulár. Pri veľkom systémovom texte sa navigácia, voľby paliva/ceny a prepínače s vysvetlením usporiadajú pod seba. Hlavný nadpis a značka majú najviac dvojnásobné zväčšenie; nadpis, značka úvodu a veľká suma sa prispôsobujú šírke. Ostatný text zachováva systémovú mierku.
 - Lokálna SQLite databáza bez predvyplnených demo záznamov.
 - [JSON záloha a obnova](backup-and-restore.md): systémové zdieľanie a výber súboru, validácia, náhľad a potvrdené atomické nahradenie celej histórie. Dostupné aj pred vytvorením vozidla; manuálna nešifrovaná záloha, bez synchronizácie. Hlavný tok uloženia a obnovy cez súborové UI používateľ overil v simulátore; zostávajúce kontroly uvádza manuálny scenár.
 
@@ -41,6 +41,7 @@ Použité API je overené podľa [oficiálnej dokumentácie expo-sqlite](https:/
 
 ## Overenie
 
+- [Úzke rozloženie a veľký text](responsive-layout-review.md): opravené zalamovanie veľkých súm, nadpisov a volieb. Cielene skúšaný obsah so šírkou 320 bodov a klávesnica na samostatnom iPhone 13 mini pri bežnom aj najväčšom texte. Prešli typy, 69 testov a iOS export; nejde o celý tok na 320-bodovom zariadení ani skúšku VoiceOver či fyzického iPhonu.
 - Po doplnení grafov prešli typy, 69 testov a iOS export. Agent overil aktuálne QA hodnoty a pomocou dočasných dát iba pre zobrazenie aj stránkovanie, nuly, medzeru, prázdny stav a prvé čiastočné tankovanie. Overené veľký text a tmavý mesačný graf; detaily a limity sú v [grafoch štatistík](statistics-charts.md).
 - [Cielená kontrola navigácie a prístupnosti](ui-accessibility-review.md): agent overil návraty, ochranu neuložených vstupov, chyby prázdneho formulára, softvérovú klávesnicu, navigáciu pri najväčšom texte a tmavý režim. Upravené názvy/stavy sú v prístupnostnom strome. Prešli typy, 63 existujúcich testov a iOS export; nejde o úplnú skúšku VoiceOver ani fyzického zariadenia.
 - Po pridaní zálohy, obnovy, CSV exportu a potvrdenia úplnosti prešla typová kontrola `npm run typecheck`, všetkých 63 testov cez `npm test` a export iOS JS/Hermes balíka. Hlavný tok súborového UI následne používateľ úspešne overil v simulátore; podrobnosti v [overení zálohy](backup-and-restore.md).
