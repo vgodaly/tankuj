@@ -298,6 +298,7 @@ function RefuelEditor({ record }: { record?: Refuel }) {
       </View>
       <TextButton
         title={more ? 'Skryť ďalšie možnosti ↑' : 'Dátum a ďalšie možnosti →'}
+        expanded={more}
         disabled={busy}
         onPress={() => {
           if (!busy) setMore((value) => !value);

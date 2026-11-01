@@ -29,7 +29,14 @@ export default function Statistics() {
         <Copy small muted>
           CELKOVÁ SPOTREBA
         </Copy>
-        <Amount value={result.average === null ? '—' : formatNumber(result.average)} />
+        <Amount
+          value={result.average === null ? '—' : formatNumber(result.average)}
+          accessibilityLabel={
+            result.average === null
+              ? 'Celková spotreba zatiaľ nie je dostupná'
+              : `Celková spotreba: ${formatNumber(result.average)} litrov na 100 km`
+          }
+        />
         <Copy small muted>
           l/100 km · vážené vzdialenosťou
         </Copy>

@@ -10,6 +10,7 @@ import {
   Text,
   TextInput,
   useColorScheme,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import type { TextInputProps } from 'react-native';
@@ -87,6 +88,7 @@ export function Heading({ title, subtitle }: { title: string; subtitle?: string 
     <View style={{ gap: 8 }}>
       <Text
         accessibilityRole="header"
+        maxFontSizeMultiplier={2}
         style={{
           color: c.text,
           fontSize: 32,
@@ -158,6 +160,7 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || busy, busy }}
       disabled={disabled || busy}
       onPress={onPress}
@@ -195,17 +198,19 @@ export function TextButton({
   onPress,
   disabled = false,
   destructive = false,
+  expanded,
 }: {
   title: string;
   onPress: () => void;
   disabled?: boolean;
   destructive?: boolean;
+  expanded?: boolean;
 }) {
   const c = usePalette();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled, expanded }}
       disabled={disabled}
       onPress={onPress}
       style={{ minHeight: 44, justifyContent: 'center', paddingVertical: 8 }}
@@ -223,10 +228,19 @@ export function TextButton({
     </Pressable>
   );
 }
-export function Amount({ value, unit }: { value: string; unit?: string }) {
+export function Amount({
+  value,
+  unit,
+  accessibilityLabel,
+}: {
+  value: string;
+  unit?: string;
+  accessibilityLabel?: string;
+}) {
   const c = usePalette();
   return (
     <Text
+      accessibilityLabel={accessibilityLabel}
       style={{
         color: c.text,
         fontSize: 40,
@@ -244,6 +258,9 @@ export function Metric({ label, value }: { label: string; value: string }) {
   const c = usePalette();
   return (
     <View
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`${label}: ${value}`}
       style={{
         gap: 4,
         paddingVertical: 10,
@@ -318,8 +335,12 @@ export function RecordRow({ record }: { record: Refuel }) {
         ', ' +
         money(record.amountCents) +
         ', ' +
-        formatNumber(record.volumeMl / 1000) +
-        ' litrov. Detail tankovania.'
+        formatNumber(record.odometerKm, 0) +
+        ' km, ' +
+        formatNumber(record.volumeMl / 1000, 3) +
+        ' litrov, ' +
+        (record.full ? 'plná nádrž' : 'čiastočné tankovanie') +
+        '. Detail tankovania.'
       }
       onPress={() => router.push({ pathname: '/record', params: { id: record.id } })}
       style={({ pressed }) => ({
@@ -360,6 +381,8 @@ export function Page({
 }) {
   const c = usePalette();
   const insets = useSafeAreaInsets();
+  const { fontScale } = useWindowDimensions();
+  const largeText = fontScale > 1.5;
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: c.background }}
@@ -386,6 +409,7 @@ export function Page({
             <View
               style={{
                 flexDirection: 'row',
+                flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 16,
@@ -393,7 +417,13 @@ export function Page({
             >
               <Text
                 accessibilityLabel="Tankuj"
-                style={{ color: c.green, fontSize: 28, fontWeight: '600', letterSpacing: -1.5 }}
+                maxFontSizeMultiplier={2}
+                style={{
+                  color: c.green,
+                  fontSize: 28,
+                  fontWeight: '600',
+                  letterSpacing: -1.5,
+                }}
               >
                 tankuj.
               </Text>
@@ -412,7 +442,7 @@ export function Page({
             backgroundColor: c.paper,
             borderTopWidth: StyleSheet.hairlineWidth,
             borderTopColor: c.line,
-            flexDirection: 'row',
+            flexDirection: largeText ? 'column' : 'row',
             gap: 4,
           }}
         >
@@ -431,7 +461,7 @@ export function Page({
                 if (tab !== item.key) router.replace(item.href);
               }}
               style={{
-                flex: 1,
+                flex: largeText ? undefined : 1,
                 minHeight: 48,
                 padding: 10,
                 alignItems: 'center',
@@ -445,6 +475,7 @@ export function Page({
                   fontSize: 13,
                   color: tab === item.key ? c.green : c.muted,
                   fontWeight: tab === item.key ? '600' : '400',
+                  textAlign: 'center',
                 }}
               >
                 {item.title}

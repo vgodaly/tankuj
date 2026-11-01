@@ -81,7 +81,7 @@ export default function RecordDetail() {
     <Page brand={false}>
       <Stack.Screen options={{ gestureEnabled: !busy }} />
       <TextButton
-        title="← História"
+        title="← Späť"
         disabled={busy}
         onPress={() => (router.canGoBack() ? router.back() : router.replace('/history'))}
       />

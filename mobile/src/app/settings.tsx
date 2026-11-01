@@ -16,7 +16,7 @@ export default function Settings() {
   return (
     <Page brand={false}>
       <TextButton
-        title="← Prehľad"
+        title="← Späť"
         onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
       />
       <Heading title="Nastavenia" subtitle="Tvoje auto a tvoje údaje." />
