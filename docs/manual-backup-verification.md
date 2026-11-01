@@ -1,6 +1,6 @@
 # Manuálne overenie zálohy a obnovy
 
-Pripravené 1. 11. 2026. Stav: **hlavný tok úspešne overený používateľom** v simulátore cez Expo Go. Používateľ v chate potvrdil uloženie súboru, načítanie náhľadu, zrušenie výberu a obnovy, nahradenie zmenenej histórie pôvodnou zálohou aj zachovanie údajov po úplnom zatvorení a opätovnom otvorení Expo Go. Kontext: iPhone 17, iOS 27.0; presná verzia Expo Go nebola zisťovaná. Agent výsledky priamo nepozoroval. Zostávajúce kontroly sú rozlíšené v tabuľke; fyzický iPhone nebol testovaný.
+Pripravené 1. 11. 2026. Stav: **hlavný tok úspešne overený používateľom** v simulátore cez Expo Go. Používateľ v chate potvrdil uloženie súboru, načítanie náhľadu, zrušenie výberu a obnovy, nahradenie zmenenej histórie pôvodnou zálohou aj zachovanie údajov po úplnom zatvorení a opätovnom otvorení Expo Go. Kontext: iPhone 17, iOS 27.0; presná verzia Expo Go nebola zisťovaná. Predchádzajúce výsledky hlavného toku agent priamo nepozoroval; následné negatívne UI testy vykonal a pozoroval samostatne. Zostávajúce kontroly sú rozlíšené v tabuľke; fyzický iPhone nebol testovaný.
 
 Použi testovaciu históriu po [základnom scenári](manual-verification.md): A (10 000 km, 40 l, 64 €), C (10 500 km, 20 l, 32 €), E (11 000 km, 30 l, 48 €), všetky plné. Súhrn: 144 €, 90 l, jediný platný interval 500 km, spotreba 6,00 l/100 km a staršia medzera po vymazaní B.
 
@@ -27,7 +27,7 @@ Použi testovaciu históriu po [základnom scenári](manual-verification.md): A 
 | Zrušenie náhľadu a konečného potvrdenia | Prešlo podľa používateľa; po zrušení konečného potvrdenia zostalo 146 € a E za 50 € |
 | Úplná obnova, ceny, súhrny a medzery | Prešlo podľa používateľa: E sa vrátil z 50 € na 48 €, platby zo 146 € na 144 €; 3 tankovania, 90 l, spotreba 6,00 l/100 km za 500 km, 1 interval a upozornenie na staršiu medzeru |
 | Zachovanie obnovy po zatvorení/otvorení | Prešlo podľa používateľa: rovnaký obnovený stav po úplnom zatvorení a otvorení Expo Go |
-| Neplatný súbor/verzia nemení dáta | Neoverené |
+| Neplatný súbor/verzia nemení dáta | Prešlo pri samostatnom UI teste agenta: obe očakávané chyby, odstránený pôvodný náhľad, 3 tankovania; následne overené 144 €, 90 l, 6,00 l/100 km, 1 interval za 500 km a zachovaná medzera |
 | Obnova pri prvom spustení | Neoverené |
 
 ## Súbory pre negatívne overenie
@@ -37,4 +37,10 @@ Agent pripravil dva syntetické súbory, ktoré neobsahujú používateľovu his
 - `tankuj-test-unsupported-version.json`: inak správna štruktúra prázdnej zálohy s `version: 2`; očakávaná chyba „Táto verzia zálohy nie je podporovaná.“
 - `tankuj-test-invalid-json.json`: neplatný JSON; očakávaná chyba „Súbor neobsahuje platnú JSON zálohu.“
 
-V Node bolo overené odmietnutie oboch súborov s uvedenými správami bez prístupu k databáze. Existujúce zálohy neboli prepísané. Ich výber cez mobilné UI a nezmenená evidencia po odmietnutí zatiaľ čakajú na potvrdenie používateľom. Po každom pokuse majú zostať 3 tankovania, 144 €, 90 l, spotreba 6,00 l/100 km a staršia medzera; nesmie zostať dostupný náhľad predchádzajúcej platnej zálohy.
+V Node bolo overené odmietnutie oboch súborov s uvedenými správami bez prístupu k databáze. Existujúce zálohy neboli prepísané. Agent následne oba súbory sám vybral cez systémový dialóg v Device Hub a priamo overil zobrazenie uvedených chýb, zmiznutie pôvodného platného náhľadu a počet 3 tankovaní. V prehľade a štatistikách potom overil 144 €, 90 l, spotrebu 6,00 l/100 km za 500 km, 1 interval a zachované upozornenie na neúplný úsek. Ide o agentom vykonaný UI test v Expo Go, nie o nový opakovateľný automatizovaný regresný test. Po každom pokuse majú zostať 3 tankovania, 144 €, 90 l, spotreba 6,00 l/100 km a staršia medzera; nesmie zostať dostupný náhľad predchádzajúcej platnej zálohy.
+
+## Ďalšie testovanie agentom
+
+Rutinné technické kontroly má najprv vykonávať agent dostupnými nástrojmi. Používateľské testovanie sa sústredí na zrozumiteľnosť a pohodlie používania; obmedzenie ovládania sa musí uviesť konkrétne pred odovzdaním kontroly používateľovi.
+
+Pri tomto pokuse pripojenie k Device Hub cez bundle ID dvakrát vypršalo. Následné pripojenie cez názov „Device Hub“ po načítaní Findera uspelo. Bežné obrazovky Tankuj sa dali ovládať cez prístupnostný strom; systémový výber súboru vyžadoval snímky a súradnice s overením mierky. Údaje aplikácie ani systémové nastavenia sa kvôli pripojeniu nemenili.
