@@ -1,15 +1,16 @@
 # Stav projektu a rozhodnutia
 
-Posledná aktualizácia: 24. 10. 2026.
+Posledná aktualizácia: 1. 11. 2026.
 
-## Pozastavenie vývoja
+## Obnovenie vývoja na novom Macu
 
-- Vývoj je na výslovnú žiadosť používateľa pozastavený do prechodu na nový počítač. Dôvodom je výrazné spomaľovanie aktuálneho Macu pri iOS simulátore.
-- Bez nového pokynu nepokračovať v implementácii ani v testovaní. Najbližší krok nižšie je pripravený až na obnovenie práce.
-- Pred pozastavením bol pracovný strom čistý a main zhodný s origin/main; implementácia vrátane úprav a mazania tankovaní je pushnutá. Poznámka o pozastavení vzniká v samostatnom lokálnom commite, push zostáva na používateľovi.
-- Pri ukončení boli vypnuté oba simulátory iPhone 17 a Tankuj QA a lokálny Expo/Metro server. Overené: žiadny bežiaci simulátor, port 8081 bez servera a pôvodné procesy Expo ukončené; náhľad prototypu na porte 8765 nebežal. Device Hub a Xcode boli ukončené bežnou voľbou Quit a následne overené ako nebežiace. Projekt, závislosti a dáta simulátorov sa nemažú.
-- Manuálne overenie celého mobilného toku zostáva otvorené. Posledná úspešná kontrola kódu: TypeScript a 35 doménových/SQLite testov; pri pozastavení sa náročné testy znovu nespúšťajú.
-- Pri prechode na nový počítač nezamieňať Git zálohu zdrojov so zálohou údajov aplikácie: lokálna SQLite databáza simulátora nie je v Gite. Export/obnova zatiaľ nie sú implementované; prípadný prenos skúšobnej histórie treba riešiť osobitne.
+- Používateľ obnovil vývoj po presune na nový Mac; pozastavenie z 24. 10. už neplatí.
+- Agent overil prostredie: Mac17,3, arm64, 16 GB RAM, macOS 27.2 (26B123), Node.js 24.22.1, npm 11.19.1 a Xcode 27.2 (27B52). Verzie zodpovedajú používateľom hlásenému novému prostrediu.
+- Repozitár je v `/Users/v/Developer/tankuj`, remote je `https://github.com/vgodaly/tankuj.git`. Pri začatí kontroly bola vetva `main` zhodná s lokálnou referenciou `origin/main` (bez fetch); jedinou necommitnutou zmenou bolo `unstable_settings.anchor: 'index'` namiesto `initialRouteName` v `mobile/src/app/_layout.tsx`. Táto požadovaná zmena je zahrnutá do obnovenia práce.
+- Používateľ potvrdil úspešné `npm ci`, 35 testov a spustenie aplikácie cez Expo Go na novom Macu. Agent samostatne zopakoval `npm run typecheck` a `npm test`: typová kontrola aj všetkých 35 doménových/SQLite testov prešli. Node hlási upozornenie MODULE_TYPELESS_PACKAGE_JSON; testy nezlyhali.
+- Agent overil spustený simulátor iPhone 17 s iOS 27.0. Úplný mobilný tok ani reštart s tankovaniami tým nie sú overené; fyzické zariadenie nebolo testované.
+- Pripravený [manuálny scenár](manual-verification.md) pre pridanie, úpravu, oba dôvody vymazania, spotrebu a zachovanie údajov po ukončení a opätovnom otvorení Expo Go. Výsledky čakajú na manuálne overenie používateľom.
+- Git neobsahuje SQLite údaje zo starého simulátora. Export a obnova ešte nie sú implementované; budú nasledovať po manuálnom overení.
 
 ## Cieľ
 
@@ -66,7 +67,7 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 - Pri kontrole prototypu prešlo 13 skupín interakčných scenárov v jsdom a 14 výpočtov kontrastu textu voči povrchu. Podrobnosti a obmedzenia sú v [kontrole prototypu](prototype-review.md).
 - Vizuálna kontrola v prehliadači nebola dokončená: dostupný prehliadač odmietol lokálny súbor. Rozloženie, systémová klávesnica a VoiceOver ešte vyžadujú overenie.
-- Node.js 24.21.0 a npm 11.19.0 sú dostupné. Aktívny Xcode 27.1, build 27A9275, bol overený cez xcodebuild.
+- Historické prostredie na starom Macu: Node.js 24.21.0, npm 11.19.0 a Xcode 27.1 (27A9275). Aktuálne verzie sú uvedené v časti o obnovení vývoja.
 - Dňa 24. 10. 2026 overená odpoveď Metro servera na /status a nainštalované Expo Go 58.0.7 na iPhone 17 s iOS 27.0. iPhone Duo s iOS 27.1 je vypnutý.
 - Spustenie predvolenej aplikácie overené v simulátore pomocou zobrazenia Device Hub a prístupnostného stromu. Toto nie je lokálny natívny build ani overenie na fyzickom iPhone.
 - Po prenose UI vizuálne overená skutočná úvodná obrazovka Tankuj na iPhone 17 v Expo Go. Bez vloženia testovacích tankovaní do používateľovej histórie.

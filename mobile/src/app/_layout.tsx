@@ -7,7 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Button, Copy, Heading, Page, usePalette } from '@/components/tankuj-ui';
 import { FuelProvider, useFuel } from '@/state/fuel-store';
 
-export const unstable_settings = { initialRouteName: 'index' };
+export const unstable_settings = { anchor: 'index' };
 
 function AppContent() {
   const { loading, error, retry } = useFuel();
