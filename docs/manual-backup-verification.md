@@ -20,12 +20,21 @@ Použi testovaciu históriu po [základnom scenári](manual-verification.md): A 
 | Oblasť | Výsledok |
 | --- | --- |
 | Zdieľanie a uloženie zálohy do Súborov | Prešlo podľa používateľa; uložený súbor následne vybral a úspešne obnovil |
-| Zrušenie zdieľania | Samostatne nepotvrdené |
+| Zrušenie zdieľania | Prešlo podľa používateľa pri zálohovaní súčasných údajov z náhľadu; evidencia zostala nezmenená |
 | Zrušenie výberu súboru | Prešlo podľa používateľa, evidencia zostala nezmenená |
 | Náhľad zálohy | Prešlo podľa používateľa: správne vozidlo, 3 tankovania, rozsah dát a medzera |
-| Záloha súčasných údajov z náhľadu | Neoverené |
+| Záloha súčasných údajov z náhľadu | Prešlo podľa používateľa: po zrušení zdieľania zopakoval uloženie nového súboru, náhľad pôvodnej zálohy zostal dostupný; po zrušení obnovy zostali 3 tankovania a 144 € |
 | Zrušenie náhľadu a konečného potvrdenia | Prešlo podľa používateľa; po zrušení konečného potvrdenia zostalo 146 € a E za 50 € |
 | Úplná obnova, ceny, súhrny a medzery | Prešlo podľa používateľa: E sa vrátil z 50 € na 48 €, platby zo 146 € na 144 €; 3 tankovania, 90 l, spotreba 6,00 l/100 km za 500 km, 1 interval a upozornenie na staršiu medzeru |
 | Zachovanie obnovy po zatvorení/otvorení | Prešlo podľa používateľa: rovnaký obnovený stav po úplnom zatvorení a otvorení Expo Go |
 | Neplatný súbor/verzia nemení dáta | Neoverené |
 | Obnova pri prvom spustení | Neoverené |
+
+## Súbory pre negatívne overenie
+
+Agent pripravil dva syntetické súbory, ktoré neobsahujú používateľovu históriu, a skopíroval ich do rovnakého priečinka Súborov v bežiacom simulátore iPhone 17, kde sú uložené zálohy Tankuj:
+
+- `tankuj-test-unsupported-version.json`: inak správna štruktúra prázdnej zálohy s `version: 2`; očakávaná chyba „Táto verzia zálohy nie je podporovaná.“
+- `tankuj-test-invalid-json.json`: neplatný JSON; očakávaná chyba „Súbor neobsahuje platnú JSON zálohu.“
+
+V Node bolo overené odmietnutie oboch súborov s uvedenými správami bez prístupu k databáze. Existujúce zálohy neboli prepísané. Ich výber cez mobilné UI a nezmenená evidencia po odmietnutí zatiaľ čakajú na potvrdenie používateľom. Po každom pokuse majú zostať 3 tankovania, 144 €, 90 l, spotreba 6,00 l/100 km a staršia medzera; nesmie zostať dostupný náhľad predchádzajúcej platnej zálohy.

@@ -45,6 +45,7 @@ Kontroly 1. 11. 2026:
 - `npx expo export --platform ios`: prešlo. Ide o vytvorenie JS/Hermes balíka, nie o natívny build ani test na zariadení.
 - `npm audit`: 15 nálezov (1 low, 11 moderate, 3 high); nálezy závislostí zostávajú otvorené. Automatická oprava sa nevykonala.
 - Manuálne overenie používateľom v Expo Go: uloženie do Súborov, výber a náhľad zálohy, zrušenie výberu a obnovy, konečné potvrdenie aj úplná obnova úspešne prešli. Po zmene E na 50 € sa obnovením pôvodnej zálohy vrátilo 48 € a celkové platby zo 146 € na 144 €; zostali 3 tankovania, 90 l, jeden interval 500 km so spotrebou 6,00 l/100 km a staršia medzera. Rovnaký stav používateľ potvrdil po úplnom zatvorení a otvorení Expo Go.
-- Manuálne zostáva overiť zrušenie zdieľania, zálohovanie súčasných údajov z náhľadu, odmietnutie neplatného súboru/verzie a obnovu pri prvom spustení. Android, fyzický iPhone a natívny build neboli testované.
+- Používateľ potvrdil aj zrušenie zdieľania a následné uloženie zálohy súčasných údajov z náhľadu. Náhľad pôvodnej zálohy zostal dostupný a po zrušení obnovy zostali 3 tankovania a 144 €.
+- Manuálne zostáva overiť odmietnutie neplatného súboru/verzie a obnovu pri prvom spustení. Android, fyzický iPhone a natívny build neboli testované.
 
 Použité API: [Expo DocumentPicker](https://docs.expo.dev/versions/v58.0.0/sdk/document-picker/), [Expo FileSystem](https://docs.expo.dev/versions/v58.0.0/sdk/filesystem/) a [Expo Sharing](https://docs.expo.dev/versions/v58.0.0/sdk/sharing/). Pribudli priame závislosti `expo-document-picker`, `expo-file-system` a `expo-sharing` kompatibilné so SDK 58; aktualizovaný je aj lockfile. Prijímanie zdieľania cez natívnu share extension sa nezapína.
