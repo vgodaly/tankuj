@@ -1,6 +1,6 @@
 # Manuálne overenie mobilného toku
 
-Pripravené 1. 11. 2026. Stav: **čiastočne overené používateľom**, pridanie A/B/C, spotreba, úprava B a zachovanie po reštarte prešli; mazanie a zachovanie medzier čakajú na overenie.
+Pripravené 1. 11. 2026. Stav: **čiastočne overené používateľom**, pridanie A/B/C, spotreba, úprava B a zachovanie po reštarte prešli; oba dôvody mazania aj zachovanie medzery po reštarte prešli; obnovenie merania C–E čaká na overenie.
 Automatizované testy v Node nenahrádzajú tento test UI a expo-sqlite.
 
 ## Príprava
@@ -49,9 +49,9 @@ História má obsahovať práve tri záznamy v poradí C, B, A. Štatistiky po C
 | Spotreba a súhrny | Prešlo podľa používateľa: po B 80 € bez spotreby; po C 6,00 l/100 km, 500 km, 1 interval, 112 € a 70 l |
 | Úprava B | Prešlo podľa používateľa: 12 l, 19,20 €, 3 záznamy, spotreba 6,40 l/100 km, platby 115,20 € a objem 72 l |
 | Zachovanie úpravy po reštarte | Prešlo podľa používateľa: úplne zatvoril Expo Go v simulátore, znovu ho otvoril a vybral Tankuj; všetky kontrolované údaje zostali zachované |
-| Zrušenie vymazania a odstránenie chybného D | Neoverené |
-| Odstránenie skutočného B a medzera | Neoverené |
-| Zachovanie vymazania a medzery po reštarte | Neoverené |
+| Zrušenie vymazania a odstránenie chybného D | Prešlo podľa používateľa: zrušenie ponechalo záznam; potvrdenie vrátilo históriu na 3 záznamy, 115,20 € a 6,40 l/100 km bez medzery |
+| Odstránenie skutočného B a medzera | Prešlo podľa používateľa: 2 záznamy, 96 €, 60 l a nedostupná spotreba s upozornením na neúplnú evidenciu |
+| Zachovanie vymazania a medzery po reštarte | Prešlo podľa používateľa: rovnaký stav po úplnom zatvorení Expo Go a opätovnom otvorení Tankuj |
 | Obnovenie merania C–E a posledný reštart | Neoverené |
 
 Doterajšie výsledky potvrdil používateľ v chate 1. 11. 2026 pri vedenom teste v Expo Go. Kontext testu: simulátor iPhone 17, iOS 27.0; presná verzia Expo Go pri tomto teste nebola zisťovaná. Tento scenár neoveruje fyzický iPhone, natívny build, zálohu ani obnovu. Po jeho dokončení nasleduje implementácia zálohy a obnovy.
