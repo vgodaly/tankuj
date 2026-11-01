@@ -40,3 +40,26 @@ Prístupnostný strom potvrdzuje názvy a niektoré stavy, nie kvalitu hovorený
 Následná [kontrola úzkeho rozloženia](responsive-layout-review.md) doplnila prispôsobenie veľkých súm a nadpisov, voľby a prepínače pod sebou pri veľkom texte a skúšku klávesnice na iPhone 13 mini. Rozlišuje dočasný obsah so šírkou 320 bodov od natívneho rozmeru zariadenia.
 
 Zostáva celý tok pri šírke 320 bodov, celá aplikácia pri najväčšom texte, VoiceOver gestá, návrat gestom, fokus po navigácii a oznamy pri chybách súborov. Pri úprave staršieho tankovania formulár zatiaľ uvádza iba posledný záznam; kontext časových susedov zostáva ďalším vylepšením podľa návrhu UX. Hlavný tok uloženia, mazania a súborových operácií už má samostatné overenia v projektovom stave.
+
+## Nadväzujúca kontrola výsledkov a VoiceOver
+
+Ďalšia cielená kontrola 1. 11. 2026 na Tankuj Restore QA. Pred začiatkom bol pracovný strom čistý a `main` zhodný s lokálnym `origin/main`. Opravy:
+
+- Výsledok zdieľania, načítania a obnovy zálohy aj chyba sú teraz hneď pod nadpisom. Po skončení práce sa obsah posunie hore a na úplný výsledný text sa odošle prístupnostný fokus. Chyba má v prístupnom názve aj slovné označenie „Chyba“.
+- Úspešný výber zálohy oznámi vozidlo, počet tankovaní a potrebu skontrolovať náhľad; výslovne uvádza, že súčasné údaje sa ešte nezmenili. Zrušený výber nevytvára oznam úspechu. Zdieľanie naďalej netvrdí, že súbor bol uložený.
+- Nové tankovanie už neoznamuje úspech zároveň z formulára aj z výslednej obrazovky. Oznam zostáva na obrazovke Tankovanie uložené; samostatný oznam úpravy zostáva zachovaný.
+
+Použitý fokus cez `AccessibilityInfo.sendAccessibilityEvent(ref, 'focus')` vychádza z [dokumentácie React Native](https://reactnative.dev/docs/accessibilityinfo#sendaccessibilityevent). Uplatní sa po vykreslení výsledku a skončení stavu práce; pri novej akcii alebo odchode sa čakajúci rámec zruší. Nepridáva sa súbežný alert oznam toho istého výsledku. Schéma, súborové formáty a obnova dát sa nemenia.
+
+| Skúška | Výsledok a hranice |
+| --- | --- |
+| Zapnutý VoiceOver, dotyk nadpisu Nastavenia a gesto doprava | Viditeľný rámik prešiel z nadpisu na popis. Po otvorení záloh bol na návratovom tlačidle. Ide o cielené pozorovanie fokusu, nie audit celého poradia ani kvality reči. |
+| Zdieľanie CSV → zrušenie so zapnutým VoiceOver | Obrazovka sa posunula hore; rámik VoiceOver sa automaticky objavil na celom výslednom texte. Súbor sa neodosielal ani neukladal. |
+| CSV vybrané ako JSON záloha | Očakávaná chyba hore a prístupný text „Chyba. Súbor neobsahuje platnú JSON zálohu.“; zostali 4 tankovania. Samotný výber sa dokončil s vypnutým VoiceOver. |
+| Platná staršia QA záloha → zrušiť obnovu | Oznam Seat/3 tankovania, správny náhľad s 1 medzerou, súčasná evidencia stále 4 tankovania. Zrušenie odstránilo náhľad aj oznam; obnova sa nevykonala. |
+| Zmenený nový formulár → Zrušiť → Pokračovať v úprave | Potvrdenie chránilo zmenu; prepínač plnej nádrže zostal zapnutý. Druhé zrušenie a Zahodiť vrátilo históriu bez zápisu. |
+| Návrat od ľavého okraja | Opakované pokusy na zálohách aj zmenenom formulári nespustili návrat. Ani dočasné porovnanie so štandardnou animáciou iOS výsledok nezmenilo; skúšobná zmena bola vrátená. Príčina nie je potvrdená. Návratové tlačidlá fungujú; gesto a jeho ochrana neuložených zmien zostávajú otvorené na vlastnom builde/zariadení. |
+
+Systémový výber súboru neposkytoval použiteľné uzly súborov; pri zapnutom VoiceOver nereagoval na pokusy o výber cez dostupné ovládanie. Preto sa neoznačuje za dokončený súborový tok s VoiceOver. Hovorený výstup nástroj nesprístupnil; viditeľný rámik neoveruje výslovnosť, úplnosť reči ani počet vyslovených oznamov. Úprava duplicitného oznamu uloženia je overená v kóde; zápis nového tankovania sa v tejto skúške neopakoval.
+
+Prešli typová kontrola, 69 existujúcich testov a iOS JS/Hermes export. Nepribudli automatizované UI regresné testy. Záverečná história a štatistiky potvrdili pôvodné 4 záznamy, 163,20 €, 102 l, 1,600 €/l a 6,20 l/100 km za 1 000 km/2 intervaly. QA zostalo na Light, Text Size 3 a VoiceOver off; pôvodný používateľov simulátor sa nemenil. Fyzický iPhone, vlastný natívny build, úplné VoiceOver a návratové gestá týmto krokom nie sú uzavreté.

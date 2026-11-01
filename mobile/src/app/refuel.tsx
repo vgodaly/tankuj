@@ -130,9 +130,7 @@ function RefuelEditor({ record }: { record?: Refuel }) {
       disablePrevention();
       if (record) router.dismissTo({ pathname: '/record', params: { id } });
       else router.replace({ pathname: '/saved', params: { id } });
-      AccessibilityInfo.announceForAccessibility(
-        record ? 'Zmeny boli uložené.' : 'Tankovanie bolo uložené.',
-      );
+      if (record) AccessibilityInfo.announceForAccessibility('Zmeny boli uložené.');
     } catch (caught) {
       if (caught instanceof ValidationError) {
         setErrors(caught.errors);

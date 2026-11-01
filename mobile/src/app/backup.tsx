@@ -1,8 +1,9 @@
 import { router, Stack, usePreventRemove } from 'expo-router';
-import { useRef, useState } from 'react';
-import { AccessibilityInfo, Alert } from 'react-native';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
+import { AccessibilityInfo, Alert, ScrollView, Text } from 'react-native';
 import {
   Button, Card, Copy, countLabel, dateLabel, Heading, Metric, Page, SectionTitle, TextButton,
+  usePalette,
 } from '@/components/tankuj-ui';
 import { pickBackup, shareBackup, shareCsv } from '@/data/backup-files';
 import { BackupError } from '@/domain/backup';
@@ -15,8 +16,23 @@ export default function BackupScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const c = usePalette();
+  const scrollRef = useRef<ComponentRef<typeof ScrollView>>(null);
+  const feedbackRef = useRef<ComponentRef<typeof Text>>(null);
   const lock = useRef(false);
   usePreventRemove(busy, () => {});
+  const feedback = error || notice;
+  useEffect(() => {
+    if (busy || !feedback) return;
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+    // Focus the visible result after committing the final enabled state. A single
+    // focus event reads the whole result without a competing alert announcement.
+    const frame = requestAnimationFrame(() => {
+      if (feedbackRef.current)
+        AccessibilityInfo.sendAccessibilityEvent(feedbackRef.current, 'focus');
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [busy, feedback]);
 
   async function perform(action: 'share' | 'csv' | 'pick' | 'restore', backup?: Backup) {
     if (lock.current) return;
@@ -34,12 +50,14 @@ export default function BackupScreen() {
       } else if (action === 'pick') {
         setPending(null);
         const selected = await pickBackup();
-        if (selected) setPending(selected);
+        if (selected) {
+          setPending(selected);
+          setNotice(`Záloha bola načítaná: ${selected.vehicle?.name ?? 'bez vozidla'}, ${countLabel(selected.refuels.length, 'tankovanie', 'tankovania', 'tankovaní')}. Pred obnovením skontroluj náhľad nižšie. Súčasné údaje sa zatiaľ nezmenili.`);
+        }
       } else if (backup) {
         await restore(backup);
         setPending(null);
         setNotice('Údaje boli obnovené. Spotrebu a súhrny sme prepočítali z obnovenej histórie.');
-        AccessibilityInfo.announceForAccessibility('Údaje boli obnovené.');
       }
     } catch (caught) {
       setError(caught instanceof BackupError ? caught.message : action === 'restore'
@@ -65,11 +83,24 @@ export default function BackupScreen() {
   const first = pending?.refuels[0];
   const last = pending?.refuels.at(-1);
   return (
-    <Page brand={false}>
+    <Page brand={false} scrollRef={scrollRef}>
       <Stack.Screen options={{ gestureEnabled: !busy }} />
       <TextButton title="← Späť" disabled={busy}
         onPress={() => router.canGoBack() ? router.back() : router.replace('/')} />
       <Heading title="Záloha a obnova" subtitle="Tvoja história aj na ďalšom telefóne." />
+      {feedback ? (
+        <Card warning={Boolean(error)} soft={!error}>
+          <Text
+            ref={feedbackRef}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={error ? `Chyba. ${feedback}` : feedback}
+            style={{ color: error ? c.error : c.text, fontSize: 16, lineHeight: 25 }}
+          >
+            {feedback}
+          </Text>
+        </Card>
+      ) : null}
       <Copy>
         Záloha je manuálny, nešifrovaný JSON súbor. Obsahuje vozidlo, tankovania aj medzery v evidencii.
         Ulož ho na miesto, ku ktorému budeš mať prístup aj pri strate telefónu.
@@ -104,8 +135,6 @@ export default function BackupScreen() {
           onPress={() => void perform('csv')} />
       </Card>
       {busy ? <Copy>Pracujeme so súborom…</Copy> : null}
-      {error ? <Copy error>{error}</Copy> : null}
-      {notice ? <Copy>{notice}</Copy> : null}
     </Page>
   );
 }

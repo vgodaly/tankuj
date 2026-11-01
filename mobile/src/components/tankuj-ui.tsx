@@ -378,10 +378,12 @@ export function Page({
   children,
   tab,
   brand = true,
+  scrollRef,
 }: {
   children: ReactNode;
   tab?: 'overview' | 'history' | 'stats';
   brand?: boolean;
+  scrollRef?: Ref<ComponentRef<typeof ScrollView>>;
 }) {
   const c = usePalette();
   const insets = useSafeAreaInsets();
@@ -397,6 +399,7 @@ export function Page({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
+          ref={scrollRef}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"
           contentContainerStyle={{
