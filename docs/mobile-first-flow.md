@@ -12,6 +12,7 @@ Stav k 1. 11. 2026: prvá vývojová verzia Tankuj, nie dokončené MVP ani verz
 - Potvrdenie zápisu, história, detail a základné číselné štatistiky po platných intervaloch.
 - Úprava z detailu v rovnakom formulári: pôvodná suma alebo zadaná jednotková cena, litre, tachometer, dátum a plná nádrž; ID sa nemení. Kontrola chronológie vynechá iba práve upravovaný záznam.
 - Vymazanie z detailu: výber chybného/duplicitného záznamu alebo skutočného tankovania, potom potvrdenie s dátumom, tachometrom a sumou. Skutočné tankovanie po odstránení zanechá medzeru. Vymazanie zatiaľ nemá funkciu späť.
+- [Potvrdenie úplnosti konkrétneho úseku](coverage-completion.md) zo štatistík: pomenované hranice, konečné potvrdenie, atomické odstránenie iba vybraných medzier a prepočet. Otvorené úseky vyžadujú doplnenie ohraničujúcich tankovaní.
 - Svetlý a tmavý farebný základ podľa návrhu; klávesnicou posúvateľný formulár.
 - Lokálna SQLite databáza bez predvyplnených demo záznamov.
 - [JSON záloha a obnova](backup-and-restore.md): systémové zdieľanie a výber súboru, validácia, náhľad a potvrdené atomické nahradenie celej histórie. Dostupné aj pred vytvorením vozidla; manuálna nešifrovaná záloha, bez synchronizácie. Hlavný tok uloženia a obnovy cez súborové UI používateľ overil v simulátore; zostávajúce kontroly uvádza manuálny scenár.
@@ -28,7 +29,7 @@ Databáza tankuj.db obsahuje vozidlo, tankovania a samostatné body neúplnej ev
 
 Pri oprave ceny, litrov, dátumu alebo plnej nádrže sa existujúce body medzier nemažú. Ak sa mení tachometer pri medzere v úseku presunu alebo pri jeho susedných hraniciach, zachováme aj pôvodný a nový bod tachometra ako medzery. Je to konzervatívne pravidlo: môže vylúčiť ďalší dotknutý interval, ale presun nesmie potichu vyhlásiť evidenciu za úplnú. Formulár na tento dôsledok upozorní. Samotná zmena dátumu bez zmeny tachometra pri platnej chronológii body nepridáva.
 
-Voľba vynechaného tankovania pri úprave pridáva medzeru; jej vypnutie neodstraňuje skôr uložené medzery. Doplnenie záznamu tiež samo medzeru neuzatvára. Rozhranie na výslovné potvrdenie úplnosti konkrétneho úseku ešte zostáva otvorené.
+Voľba vynechaného tankovania pri úprave pridáva medzeru; jej vypnutie neodstraňuje skôr uložené medzery. Doplnenie záznamu tiež samo medzeru neuzatvára. Úplnosť konkrétneho úseku sa potvrdzuje samostatne cez Štatistiky → Skontrolovať medzery; podmienky a ochrana pred zmenou histórie sú v [špecifikácii](coverage-completion.md).
 
 Objemy sú celé mililitre, sumy celé centy a pôvodná jednotková cena celé tisíciny EUR/l. Výpočet sumy používa celočíselné zaokrúhlenie half-up. Odvodené pomery sa zaokrúhľujú až pri zobrazení.
 
@@ -40,7 +41,7 @@ Použité API je overené podľa [oficiálnej dokumentácie expo-sqlite](https:/
 
 ## Overenie
 
-- Po pridaní zálohy, obnovy a CSV exportu prešla typová kontrola `npm run typecheck`, všetkých 52 testov cez `npm test` a export iOS JS/Hermes balíka. Hlavný tok súborového UI následne používateľ úspešne overil v simulátore; podrobnosti v [overení zálohy](backup-and-restore.md).
+- Po pridaní zálohy, obnovy, CSV exportu a potvrdenia úplnosti prešla typová kontrola `npm run typecheck`, všetkých 63 testov cez `npm test` a export iOS JS/Hermes balíka. Hlavný tok súborového UI následne používateľ úspešne overil v simulátore; podrobnosti v [overení zálohy](backup-and-restore.md).
 - Testy: npm test, Node.js 24 a jeho vstavané testovacie a SQLite moduly.
 - Doménové testy: presné vstupy, zaokrúhlenie, dátumy, susedia, plné/čiastočné tankovania, medzery, vážená spotreba a cena.
 - Integračné testy používajú rovnaké repository funkcie a skutočné SQLite cez adaptér pre Node. Pokrývajú migráciu, odmietnutie novšej schémy, atomický rollback pri chybe, duplicity a zachovanie údajov po zatvorení a opätovnom otvorení databázového súboru.
@@ -54,6 +55,6 @@ Testy repository v Node nenahrádzajú úplné overenie expo-sqlite na zariaden�
 
 ## Zostávajúce funkcie MVP
 
-Potvrdenie doplnenia konkrétnej medzery a grafy. CSV export aj jeho uloženie cez UI QA simulátora sú overené; priame otvorenie v Exceli/Numbers ešte nie. Hlavný mobilný tok JSON zálohy a obnovy úspešne prešiel; zostávajúce okrajové a vstupné scenáre uvádza [manuálna skúška](manual-backup-verification.md).
+Grafy a dokončenie širšieho overenia UI. Potvrdenie úplnosti konkrétneho úseku je implementované a agentom overené v QA simulátore vrátane zachovania inej medzery po reštarte. CSV export aj jeho uloženie cez UI QA simulátora sú overené; priame otvorenie v Exceli/Numbers ešte nie. Hlavný mobilný tok JSON zálohy a obnovy úspešne prešiel; zostávajúce okrajové a vstupné scenáre uvádza [manuálna skúška](manual-backup-verification.md).
 
 Hlásené nálezy npm audit ostávajú otvorené (1. 11.: 15 nálezov, z toho 3 high). Ochrana histórie vyžaduje vedomé uloženie zálohy používateľom. Hlavný tok obnovy je overený v simulátore; fyzický iPhone a zostávajúce scenáre ešte vyžadujú samostatné testovanie pred širšou betou.

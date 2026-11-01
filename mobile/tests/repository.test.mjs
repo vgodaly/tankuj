@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import test from 'node:test';
 import {
+  confirmCoverage,
   createVehicle,
   deleteRefuel,
   exportBackup,
@@ -16,6 +17,7 @@ import {
   updateRefuel,
 } from '../src/data/fuel-repository.ts';
 import { parseBackup, serializeBackup } from '../src/domain/backup.ts';
+import { CoverageChangedError, coverageSections } from '../src/domain/coverage.ts';
 import { draftFromRefuel, measure, summarize, ValidationError } from '../src/domain/fuel.ts';
 
 function adapter(connection = new DatabaseSync(':memory:')) {
@@ -219,6 +221,146 @@ test('CSV export reads current persisted data and leaves records, IDs and gaps u
     assert.ok(lines[2].endsWith(';"Áno";"Áno";"Nie"'));
     assert.deepEqual(await readSnapshot(db), before);
   });
+});
+
+test('confirming a backfilled section recalculates consumption and removes only its coverage points', async () => {
+  await history(async (db, ids) => {
+    await deleteRefuel(db, ids.middle, 'real');
+    await insertRefuel(db, draft({ date: '2026-10-10', odometer: '10200', liters: '12', price: '19.20', full: false }), '2026-11-01');
+    await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', 10400);
+    await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', 11000);
+    const before = await readSnapshot(db);
+    assert.equal(measure(before.refuels, before.gaps).average, null);
+    const selected = coverageSections(before.refuels, before.gaps)[0];
+    const after = await confirmCoverage(db, selected);
+    assert.deepEqual(after.refuels, before.refuels);
+    assert.deepEqual(after.vehicle, before.vehicle);
+    assert.deepEqual(after.gaps.map((g) => g.atOdometerKm), [10400, 11000]);
+    assert.equal(measure(after.refuels, after.gaps).average, null, 'other gap still blocks the interval');
+    const completed = await confirmCoverage(db, coverageSections(after.refuels, after.gaps)[0]);
+    assert.deepEqual(completed.gaps.map((g) => g.atOdometerKm), [11000]);
+    assert.equal(measure(completed.refuels, completed.gaps).average, 6.4);
+    assert.deepEqual(summarize(completed.refuels, '2026-10'), summarize(before.refuels, '2026-10'));
+  });
+});
+
+test('one confirmation clears every point in its bounded section but preserves prefix and tail gaps', async () => {
+  await history(async (db) => {
+    for (const at of [9900, 10100, 10200, 10200, 10600])
+      await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', at);
+    const before = await readSnapshot(db);
+    const selected = coverageSections(before.refuels, before.gaps).find((s) => s.start && s.end);
+    assert.equal(selected.gaps.length, 3);
+    const after = await confirmCoverage(db, selected);
+    assert.deepEqual(after.gaps.map((g) => g.atOdometerKm), [9900, 10600]);
+    assert.equal(measure(after.refuels, after.gaps).average, 6);
+    await assert.rejects(confirmCoverage(db, selected), CoverageChangedError);
+    assert.deepEqual(await readSnapshot(db), after);
+  });
+});
+
+test('stale section confirmations reject edits, backfill, extra points and reused IDs after restore', async () => {
+  for (const change of ['edit', 'backfill', 'new-gap', 'restore']) {
+    await history(async (db, ids) => {
+      await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', 10100);
+      let before = await readSnapshot(db);
+      const selected = coverageSections(before.refuels, before.gaps)[0];
+      if (change === 'edit')
+        await updateRefuel(db, ids.middle, { ...draftFromRefuel(before.refuels[1]), liters: '12' }, '2026-11-01');
+      if (change === 'backfill')
+        await insertRefuel(db, draft({ date: '2026-10-05', odometer: '10050' }), '2026-11-01');
+      if (change === 'new-gap')
+        await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', 10150);
+      if (change === 'restore') {
+        const backup = parseBackup(await exportBackup(db), '2026-11-01');
+        backup.refuels[0].amountCents += 1;
+        await restoreBackup(db, backup, '2026-11-01');
+      }
+      before = await readSnapshot(db);
+      await assert.rejects(confirmCoverage(db, selected), CoverageChangedError);
+      assert.deepEqual(await readSnapshot(db), before);
+    });
+  }
+});
+
+test('unrelated later edits do not invalidate the explicitly selected earlier section', async () => {
+  await history(async (db, ids) => {
+    await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', 10100);
+    const before = await readSnapshot(db);
+    const selected = coverageSections(before.refuels, before.gaps)[0];
+    await updateRefuel(db, ids.last, { ...draftFromRefuel(before.refuels[2]), price: '33' }, '2026-11-01');
+    const after = await confirmCoverage(db, selected);
+    assert.equal(after.gaps.length, 0);
+    assert.equal(after.refuels[2].amountCents, 3300);
+  });
+});
+
+test('unbounded and forged selections never clear missing-history information', async () => {
+  await history(async (db) => {
+    for (const at of [9900, 10100, 10600])
+      await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', at);
+    const before = await readSnapshot(db);
+    const sections = coverageSections(before.refuels, before.gaps);
+    for (const selection of [sections[0], sections.at(-1), { ...sections[1], gaps: [] },
+      { ...sections[1], gaps: [...sections[1].gaps, sections[2].gaps[0]] }]) {
+      await assert.rejects(confirmCoverage(db, selection), CoverageChangedError);
+      assert.deepEqual(await readSnapshot(db), before);
+    }
+    for (const record of before.refuels) await deleteRefuel(db, record.id, 'incorrect');
+    const empty = await readSnapshot(db);
+    await assert.rejects(confirmCoverage(db, coverageSections(empty.refuels, empty.gaps)[0]), CoverageChangedError);
+    assert.deepEqual(await readSnapshot(db), empty);
+  });
+});
+
+test('coverage confirmation rolls back a partially completed deletion and allows retry', async () => {
+  await history(async (db) => {
+    for (const at of [10100, 10150])
+      await db.runAsync('INSERT INTO coverage_gaps (at_odometer_km) VALUES (?)', at);
+    const before = await readSnapshot(db);
+    const selected = coverageSections(before.refuels, before.gaps)[0];
+    const run = db.runAsync.bind(db);
+    let deletes = 0;
+    db.runAsync = async (sql, ...params) => {
+      if (sql.startsWith('DELETE FROM coverage_gaps') && ++deletes === 2)
+        throw new Error('Simulated confirmation failure');
+      return run(sql, ...params);
+    };
+    await assert.rejects(confirmCoverage(db, selected), /Simulated confirmation failure/);
+    assert.deepEqual(await readSnapshot(db), before);
+    db.runAsync = run;
+    assert.equal((await confirmCoverage(db, selected)).gaps.length, 0);
+  });
+});
+
+test('completed sections persist on disk and JSON restore does not resurrect their cleared gaps', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'tankuj-coverage-test-'));
+  let db;
+  try {
+    const path = join(directory, 'tankuj.db');
+    db = adapter(new DatabaseSync(path));
+    await initializeDatabase(db);
+    await createVehicle(db, { name: 'Coverage QA', fuel: 'Benzín' });
+    await insertRefuel(db, draft({}), '2026-11-01');
+    await insertRefuel(db, draft({ odometer: '10500', liters: '30', price: '48', missed: true }), '2026-11-01');
+    let before = await readSnapshot(db);
+    const completed = await confirmCoverage(db, coverageSections(before.refuels, before.gaps)[0]);
+    assert.equal(measure(completed.refuels, completed.gaps).average, 6);
+    db.connection.close();
+    db = adapter(new DatabaseSync(path));
+    await initializeDatabase(db);
+    assert.deepEqual(await readSnapshot(db), completed);
+    const backup = parseBackup(await exportBackup(db), '2026-11-01');
+    assert.deepEqual(backup.gaps, []);
+    await insertRefuel(db, draft({ odometer: '11000', missed: true }), '2026-11-01');
+    before = await restoreBackup(db, backup, '2026-11-01');
+    assert.deepEqual(before, completed);
+    assert.equal(measure(before.refuels, before.gaps).average, 6);
+    assert.equal(db.connection.prepare('PRAGMA user_version').get().user_version, 1);
+  } finally {
+    db?.connection.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test('export and restore replace the dataset while preserving identities, prices, gaps and results', async () => {

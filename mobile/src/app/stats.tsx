@@ -1,4 +1,4 @@
-import { Redirect } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { View } from 'react-native';
 import {
   Amount,
@@ -12,6 +12,7 @@ import {
   money,
   Page,
   SectionTitle,
+  TextButton,
 } from '@/components/tankuj-ui';
 import { localToday, measure, measurementHelp, summarize } from '@/domain/fuel';
 import { useFuel } from '@/state/fuel-store';
@@ -55,6 +56,7 @@ export default function Statistics() {
           <Copy small>
             Neúplné úseky vynechávame zo spotreby. Platby obsahujú iba zapísané tankovania.
           </Copy>
+          <TextButton title="Skontrolovať medzery →" onPress={() => router.push('/coverage')} />
         </Card>
       ) : null}
       {result.intervals.length ? (

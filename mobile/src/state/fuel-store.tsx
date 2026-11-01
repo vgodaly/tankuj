@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import type { ReactNode } from 'react';
 
 import {
+  confirmCoverage,
   createVehicle,
   deleteRefuel,
   exportBackup,
@@ -14,6 +15,7 @@ import {
   restoreBackup,
   updateRefuel,
 } from '@/data/fuel-repository';
+import type { CoverageSection } from '@/domain/coverage';
 import type { DeleteReason, RefuelDraft, Snapshot, Vehicle } from '@/domain/fuel';
 
 let connection: Promise<SQLiteDatabase> | null = null;
@@ -43,6 +45,7 @@ type FuelStore = Snapshot & {
   getBackup: () => Promise<string>;
   getCsv: () => Promise<string>;
   restore: (backup: unknown) => Promise<void>;
+  completeCoverage: (section: CoverageSection) => Promise<void>;
 };
 const FuelContext = createContext<FuelStore | null>(null);
 const EMPTY: Snapshot = { vehicle: null, refuels: [], gaps: [] };
@@ -140,6 +143,15 @@ export function FuelProvider({ children }: { children: ReactNode }) {
       writing.current = false;
     }
   }, []);
+  const completeCoverage = useCallback(async (section: CoverageSection) => {
+    if (writing.current) throw new Error('Ukladanie už prebieha.');
+    writing.current = true;
+    try {
+      setSnapshot(await confirmCoverage(await database(), section));
+    } finally {
+      writing.current = false;
+    }
+  }, []);
   return (
     <FuelContext
       value={{
@@ -153,6 +165,7 @@ export function FuelProvider({ children }: { children: ReactNode }) {
         removeRefuel,
         getBackup,
         getCsv,
+        completeCoverage,
         restore,
       }}
     >

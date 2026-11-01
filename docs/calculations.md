@@ -75,6 +75,10 @@ Medzera je informácia o histórii, nesmie sa stratiť iba preto, že používat
 - Pri zmene dátumu alebo tachometra sa skontrolujú susedia aj dotknuté medzery. Ak nie je jasné, ktorého úseku sa medzera týka, zostane dotknuté meranie vylúčené, kým používateľ nepotvrdí úplnosť.
 - Odvodené intervaly sa v MVP môžu vždy prepočítať z celej histórie jedného auta. Bez konkrétneho dôvodu nebudujeme inkrementálnu analytiku.
 
+### Implementované potvrdenie úplnosti
+
+Od 1. 11. 2026 sa body medzier zoskupujú medzi susedné tankovania aktuálnej histórie. Používateľ potvrdzuje konkrétny úsek s oboma dátumami a tachometrami; odstránia sa iba jeho body neúplnosti. Otvorený úsek pred prvým alebo po poslednom zázname sa potvrdí až po doplnení oboch hraníc. Staré potvrdenie po zmene hraníc alebo bodov je odmietnuté. Podrobnosti a overenie sú v [potvrdení úplnosti](coverage-completion.md).
+
 ## Súhrny a interpretácia
 
 ### Celková spotreba

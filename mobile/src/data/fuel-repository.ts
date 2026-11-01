@@ -1,6 +1,8 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { serializeBackup, validateBackup } from '../domain/backup.ts';
 import { serializeCsv } from '../domain/csv.ts';
+import { CoverageChangedError, coverageSectionKey, coverageSections } from '../domain/coverage.ts';
+import type { CoverageSection } from '../domain/coverage.ts';
 import { buildRefuel, gapAnchorsForEdit, localToday } from '../domain/fuel.ts';
 import type {
   CoverageGap,
@@ -149,6 +151,25 @@ export async function deleteRefuel(db: Db, id: number, reason: DeleteReason): Pr
     if (!record) throw new Error('Tankovanie už neexistuje.');
     await transaction.runAsync('DELETE FROM refuels WHERE id = ?', id);
     if (reason === 'real') await addGap(transaction, record.odometerKm);
+    result = await readSnapshot(transaction);
+  });
+  return result!;
+}
+
+export async function confirmCoverage(db: Db, selected: CoverageSection): Promise<Snapshot> {
+  let result: Snapshot | undefined;
+  await db.withExclusiveTransactionAsync(async (transaction) => {
+    const before = await readSnapshot(transaction);
+    const key = coverageSectionKey(selected);
+    const current = coverageSections(before.refuels, before.gaps).find(
+      (section) => coverageSectionKey(section) === key,
+    );
+    if (!current || !current.start || !current.end) throw new CoverageChangedError();
+    for (const gap of current.gaps) {
+      const write = await transaction.runAsync('DELETE FROM coverage_gaps WHERE id = ? AND at_odometer_km = ?',
+        gap.id, gap.atOdometerKm);
+      if (write.changes !== 1) throw new CoverageChangedError();
+    }
     result = await readSnapshot(transaction);
   });
   return result!;
