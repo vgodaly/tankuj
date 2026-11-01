@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { serializeBackup, validateBackup } from '../domain/backup.ts';
+import { serializeCsv } from '../domain/csv.ts';
 import { buildRefuel, gapAnchorsForEdit, localToday } from '../domain/fuel.ts';
 import type {
   CoverageGap,
@@ -157,6 +158,14 @@ export async function exportBackup(db: Db): Promise<string> {
   let result = '';
   await db.withExclusiveTransactionAsync(async (transaction) => {
     result = serializeBackup(await readSnapshot(transaction));
+  });
+  return result;
+}
+
+export async function exportCsv(db: Db): Promise<string> {
+  let result = '';
+  await db.withExclusiveTransactionAsync(async (transaction) => {
+    result = serializeCsv(await readSnapshot(transaction));
   });
   return result;
 }

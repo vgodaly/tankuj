@@ -34,13 +34,13 @@ export default function Settings() {
       </Card>
       <Card>
         <SectionTitle>Tvoje údaje</SectionTitle>
-        <Copy>Vytvor si zálohu histórie alebo obnov údaje zo súboru.</Copy>
-        <TextButton title="Záloha a obnova →" onPress={() => router.push('/backup')} />
+        <Copy>Vytvor si zálohu, obnov údaje alebo exportuj históriu do tabuľky.</Copy>
+        <TextButton title="Záloha, obnova a CSV export →" onPress={() => router.push('/backup')} />
       </Card>
       <SectionTitle>Prvá vývojová verzia</SectionTitle>
       <Copy small muted>
         Údaje sa ukladajú lokálne v tomto telefóne. Zálohy vytváraš manuálne; automatická
-        synchronizácia ani CSV export zatiaľ nie sú dostupné.
+        synchronizácia zatiaľ nie je dostupná.
       </Copy>
     </Page>
   );

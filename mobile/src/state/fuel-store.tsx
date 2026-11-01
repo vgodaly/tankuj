@@ -7,6 +7,7 @@ import {
   createVehicle,
   deleteRefuel,
   exportBackup,
+  exportCsv,
   initializeDatabase,
   insertRefuel,
   readSnapshot,
@@ -40,6 +41,7 @@ type FuelStore = Snapshot & {
   editRefuel: (id: number, draft: RefuelDraft) => Promise<void>;
   removeRefuel: (id: number, reason: DeleteReason) => Promise<void>;
   getBackup: () => Promise<string>;
+  getCsv: () => Promise<string>;
   restore: (backup: unknown) => Promise<void>;
 };
 const FuelContext = createContext<FuelStore | null>(null);
@@ -129,6 +131,15 @@ export function FuelProvider({ children }: { children: ReactNode }) {
       writing.current = false;
     }
   }, []);
+  const getCsv = useCallback(async () => {
+    if (writing.current) throw new Error('Ukladanie už prebieha.');
+    writing.current = true;
+    try {
+      return await exportCsv(await database());
+    } finally {
+      writing.current = false;
+    }
+  }, []);
   return (
     <FuelContext
       value={{
@@ -141,6 +152,7 @@ export function FuelProvider({ children }: { children: ReactNode }) {
         editRefuel,
         removeRefuel,
         getBackup,
+        getCsv,
         restore,
       }}
     >

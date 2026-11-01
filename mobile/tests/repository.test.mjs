@@ -8,6 +8,7 @@ import {
   createVehicle,
   deleteRefuel,
   exportBackup,
+  exportCsv,
   initializeDatabase,
   insertRefuel,
   readSnapshot,
@@ -205,6 +206,20 @@ async function history(task) {
     db.connection.close();
   }
 }
+
+test('CSV export reads current persisted data and leaves records, IDs and gaps unchanged', async () => {
+  await history(async (db, ids) => {
+    await deleteRefuel(db, ids.middle, 'real');
+    const before = await readSnapshot(db);
+    const csv = await exportCsv(db);
+    const lines = csv.split('\r\n');
+    assert.equal(lines.length, 4, 'header, two records and final newline');
+    assert.ok(lines[1].includes(';"10000";"40,000";"64,00";'));
+    assert.ok(lines[2].includes(';"10500";"20,000";"30,00";'));
+    assert.ok(lines[2].endsWith(';"Áno";"Áno";"Nie"'));
+    assert.deepEqual(await readSnapshot(db), before);
+  });
+});
 
 test('export and restore replace the dataset while preserving identities, prices, gaps and results', async () => {
   await history(async (db, ids) => {

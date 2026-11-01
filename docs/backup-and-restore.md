@@ -1,6 +1,6 @@
 # JSON záloha a obnova
 
-Implementované 1. 11. 2026. Kontroly kódu a testy v Node prešli; používateľ následne úspešne overil hlavný mobilný tok uloženia a obnovy v simulátore cez Expo Go vrátane zachovania medzery a údajov po opätovnom otvorení. Podrobné výsledky a zostávajúce kontroly sú v [manuálnom overení](manual-backup-verification.md). CSV export zostáva samostatnou úlohou.
+Implementované 1. 11. 2026. Kontroly kódu a testy v Node prešli; používateľ následne úspešne overil hlavný mobilný tok uloženia a obnovy v simulátore cez Expo Go vrátane zachovania medzery a údajov po opätovnom otvorení. Podrobné výsledky a zostávajúce kontroly sú v [manuálnom overení](manual-backup-verification.md). Následne pribudol aj [CSV export histórie](csv-export.md), oddelený od JSON obnovy.
 
 ## Používateľský tok
 

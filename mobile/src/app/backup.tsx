@@ -4,13 +4,13 @@ import { AccessibilityInfo, Alert } from 'react-native';
 import {
   Button, Card, Copy, countLabel, dateLabel, Heading, Metric, Page, SectionTitle, TextButton,
 } from '@/components/tankuj-ui';
-import { pickBackup, shareBackup } from '@/data/backup-files';
+import { pickBackup, shareBackup, shareCsv } from '@/data/backup-files';
 import { BackupError } from '@/domain/backup';
 import type { Backup } from '@/domain/backup';
 import { useFuel } from '@/state/fuel-store';
 
 export default function BackupScreen() {
-  const { getBackup, restore, vehicle, refuels } = useFuel();
+  const { getBackup, getCsv, restore, vehicle, refuels } = useFuel();
   const [pending, setPending] = useState<Backup | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ export default function BackupScreen() {
   const lock = useRef(false);
   usePreventRemove(busy, () => {});
 
-  async function perform(action: 'share' | 'pick' | 'restore', backup?: Backup) {
+  async function perform(action: 'share' | 'csv' | 'pick' | 'restore', backup?: Backup) {
     if (lock.current) return;
     lock.current = true;
     setBusy(true);
@@ -28,6 +28,9 @@ export default function BackupScreen() {
       if (action === 'share') {
         await shareBackup(await getBackup());
         setNotice('Ak si zálohu uložil, nájdeš ju vo vybranom umiestnení. Samotné zatvorenie zdieľania ju neuloží.');
+      } else if (action === 'csv') {
+        await shareCsv(await getCsv());
+        setNotice('Ak si CSV uložil, nájdeš ho vo vybranom umiestnení. Evidencia sa exportom nemení.');
       } else if (action === 'pick') {
         setPending(null);
         const selected = await pickBackup();
@@ -41,8 +44,8 @@ export default function BackupScreen() {
     } catch (caught) {
       setError(caught instanceof BackupError ? caught.message : action === 'restore'
         ? 'Obnova sa nepodarila. Pôvodné údaje zostali zachované. Môžeš to skúsiť znova.'
-        : action === 'share'
-          ? 'Zálohu sa nepodarilo zdieľať. Skús to znova v mobilnej aplikácii a vyber miesto na uloženie.'
+        : action === 'share' || action === 'csv'
+          ? 'Súbor sa nepodarilo zdieľať. Skús to znova v mobilnej aplikácii a vyber miesto na uloženie.'
           : 'Súbor sa nepodarilo prečítať. Skús ho vybrať znova zo Súborov v mobilnej aplikácii.');
     } finally {
       lock.current = false;
@@ -94,7 +97,13 @@ export default function BackupScreen() {
           <TextButton title="Zrušiť obnovu" disabled={busy} onPress={() => { setPending(null); setError(''); setNotice(''); }} />
         </Card>
       ) : null}
-      {busy ? <Copy>Pracujeme so zálohou…</Copy> : null}
+      <Card>
+        <SectionTitle>História pre tabuľku</SectionTitle>
+        <Copy small>CSV otvoríš v Exceli alebo Numbers. Obsahuje zapísané tankovania a označenia medzier. Na obnovu v Tankuj použi JSON zálohu.</Copy>
+        <Button title="Exportovať históriu do CSV" secondary disabled={busy}
+          onPress={() => void perform('csv')} />
+      </Card>
+      {busy ? <Copy>Pracujeme so súborom…</Copy> : null}
       {error ? <Copy error>{error}</Copy> : null}
       {notice ? <Copy>{notice}</Copy> : null}
     </Page>
