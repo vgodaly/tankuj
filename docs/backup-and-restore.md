@@ -1,6 +1,6 @@
 # JSON záloha a obnova
 
-Implementované 1. 11. 2026. Kontroly kódu a testy v Node prešli; systémové zdieľanie, výber súboru a obnova cez mobilné UI ešte čakajú na [manuálne overenie](manual-backup-verification.md). CSV export zostáva samostatnou úlohou.
+Implementované 1. 11. 2026. Kontroly kódu a testy v Node prešli; používateľ následne úspešne overil hlavný mobilný tok uloženia a obnovy v simulátore cez Expo Go vrátane zachovania medzery a údajov po opätovnom otvorení. Podrobné výsledky a zostávajúce kontroly sú v [manuálnom overení](manual-backup-verification.md). CSV export zostáva samostatnou úlohou.
 
 ## Používateľský tok
 
@@ -44,6 +44,7 @@ Kontroly 1. 11. 2026:
 - SQLite testy v Node: úplné nahradenie, obnovenie do prázdnej DB, prázdna záloha, odmietnutie pred transakciou, rollback pri zlyhaní zápisu vozidla/tankovania/medzery, opakovanie, nové ID, opätovné otvorenie súboru a budúce meranie po obnovenej medzere.
 - `npx expo export --platform ios`: prešlo. Ide o vytvorenie JS/Hermes balíka, nie o natívny build ani test na zariadení.
 - `npm audit`: 15 nálezov (1 low, 11 moderate, 3 high); nálezy závislostí zostávajú otvorené. Automatická oprava sa nevykonala.
-- UI zdieľania/výberu, zrušenie systémových dialógov, finálne potvrdenie a úplný tok obnovy v Expo Go, Android a fyzický iPhone: zatiaľ neoverené.
+- Manuálne overenie používateľom v Expo Go: uloženie do Súborov, výber a náhľad zálohy, zrušenie výberu a obnovy, konečné potvrdenie aj úplná obnova úspešne prešli. Po zmene E na 50 € sa obnovením pôvodnej zálohy vrátilo 48 € a celkové platby zo 146 € na 144 €; zostali 3 tankovania, 90 l, jeden interval 500 km so spotrebou 6,00 l/100 km a staršia medzera. Rovnaký stav používateľ potvrdil po úplnom zatvorení a otvorení Expo Go.
+- Manuálne zostáva overiť zrušenie zdieľania, zálohovanie súčasných údajov z náhľadu, odmietnutie neplatného súboru/verzie a obnovu pri prvom spustení. Android, fyzický iPhone a natívny build neboli testované.
 
 Použité API: [Expo DocumentPicker](https://docs.expo.dev/versions/v58.0.0/sdk/document-picker/), [Expo FileSystem](https://docs.expo.dev/versions/v58.0.0/sdk/filesystem/) a [Expo Sharing](https://docs.expo.dev/versions/v58.0.0/sdk/sharing/). Pribudli priame závislosti `expo-document-picker`, `expo-file-system` a `expo-sharing` kompatibilné so SDK 58; aktualizovaný je aj lockfile. Prijímanie zdieľania cez natívnu share extension sa nezapína.

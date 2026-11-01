@@ -14,7 +14,7 @@ Stav k 1. 11. 2026: prvá vývojová verzia Tankuj, nie dokončené MVP ani verz
 - Vymazanie z detailu: výber chybného/duplicitného záznamu alebo skutočného tankovania, potom potvrdenie s dátumom, tachometrom a sumou. Skutočné tankovanie po odstránení zanechá medzeru. Vymazanie zatiaľ nemá funkciu späť.
 - Svetlý a tmavý farebný základ podľa návrhu; klávesnicou posúvateľný formulár.
 - Lokálna SQLite databáza bez predvyplnených demo záznamov.
-- [JSON záloha a obnova](backup-and-restore.md): systémové zdieľanie a výber súboru, validácia, náhľad a potvrdené atomické nahradenie celej histórie. Dostupné aj pred vytvorením vozidla; manuálna nešifrovaná záloha, bez synchronizácie. Mobilné súborové UI ešte čaká na overenie.
+- [JSON záloha a obnova](backup-and-restore.md): systémové zdieľanie a výber súboru, validácia, náhľad a potvrdené atomické nahradenie celej histórie. Dostupné aj pred vytvorením vozidla; manuálna nešifrovaná záloha, bez synchronizácie. Hlavný tok uloženia a obnovy cez súborové UI používateľ overil v simulátore; zostávajúce kontroly uvádza manuálny scenár.
 
 ## Kód a ukladanie
 
@@ -38,7 +38,7 @@ Použité API je overené podľa [oficiálnej dokumentácie expo-sqlite](https:/
 
 ## Overenie
 
-- Po pridaní zálohy a obnovy prešla typová kontrola `npm run typecheck`, všetkých 46 testov cez `npm test` a export iOS JS/Hermes balíka. Súborové UI ešte nebolo manuálne overené; podrobnosti v [overení zálohy](backup-and-restore.md).
+- Po pridaní zálohy a obnovy prešla typová kontrola `npm run typecheck`, všetkých 46 testov cez `npm test` a export iOS JS/Hermes balíka. Hlavný tok súborového UI následne používateľ úspešne overil v simulátore; podrobnosti v [overení zálohy](backup-and-restore.md).
 - Testy: npm test, Node.js 24 a jeho vstavané testovacie a SQLite moduly.
 - Doménové testy: presné vstupy, zaokrúhlenie, dátumy, susedia, plné/čiastočné tankovania, medzery, vážená spotreba a cena.
 - Integračné testy používajú rovnaké repository funkcie a skutočné SQLite cez adaptér pre Node. Pokrývajú migráciu, odmietnutie novšej schémy, atomický rollback pri chybe, duplicity a zachovanie údajov po zatvorení a opätovnom otvorení databázového súboru.
@@ -52,6 +52,6 @@ Testy repository v Node nenahrádzajú úplné overenie expo-sqlite na zariaden�
 
 ## Zostávajúce funkcie MVP
 
-Potvrdenie doplnenia konkrétnej medzery, grafy a CSV export. JSON záloha a obnova sú implementované, ale ich systémové súborové UI a celý mobilný tok ešte vyžadujú [manuálnu skúšku](manual-backup-verification.md).
+Potvrdenie doplnenia konkrétnej medzery, grafy a CSV export. Hlavný mobilný tok JSON zálohy a obnovy úspešne prešiel; zostávajúce okrajové a vstupné scenáre uvádza [manuálna skúška](manual-backup-verification.md).
 
-Hlásené nálezy npm audit ostávajú otvorené (1. 11.: 15 nálezov, z toho 3 high). Ochrana histórie vyžaduje vedomé uloženie a overenie zálohy používateľom; kým nie je manuálne overený celý tok zálohy a obnovy, táto verzia nemá byť jedinou evidenciou skutočných tankovaní.
+Hlásené nálezy npm audit ostávajú otvorené (1. 11.: 15 nálezov, z toho 3 high). Ochrana histórie vyžaduje vedomé uloženie zálohy používateľom. Hlavný tok obnovy je overený v simulátore; fyzický iPhone a zostávajúce scenáre ešte vyžadujú samostatné testovanie pred širšou betou.
