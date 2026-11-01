@@ -1,6 +1,6 @@
 # Manuálne overenie mobilného toku
 
-Pripravené 1. 11. 2026. Stav: **čiastočne overené používateľom**, pridanie A/B/C, spotreba, úprava B a zachovanie po reštarte prešli; oba dôvody mazania aj zachovanie medzery po reštarte prešli; obnovenie merania C–E čaká na overenie.
+Pripravené 1. 11. 2026. Stav: **vedený scenár úspešne overený používateľom** v simulátore cez Expo Go: pridanie, spotreba, úprava, oba dôvody mazania, zachovanie medzery, obnovenie merania a zachovanie dát po úplnom zatvorení a otvorení aplikácie. Úplná kontrola navigácie nad rámec vykonaných krokov zostáva otvorená.
 Automatizované testy v Node nenahrádzajú tento test UI a expo-sqlite.
 
 ## Príprava
@@ -52,6 +52,6 @@ História má obsahovať práve tri záznamy v poradí C, B, A. Štatistiky po C
 | Zrušenie vymazania a odstránenie chybného D | Prešlo podľa používateľa: zrušenie ponechalo záznam; potvrdenie vrátilo históriu na 3 záznamy, 115,20 € a 6,40 l/100 km bez medzery |
 | Odstránenie skutočného B a medzera | Prešlo podľa používateľa: 2 záznamy, 96 €, 60 l a nedostupná spotreba s upozornením na neúplnú evidenciu |
 | Zachovanie vymazania a medzery po reštarte | Prešlo podľa používateľa: rovnaký stav po úplnom zatvorení Expo Go a opätovnom otvorení Tankuj |
-| Obnovenie merania C–E a posledný reštart | Neoverené |
+| Obnovenie merania C–E a posledný reštart | Prešlo podľa používateľa: 3 záznamy, 144 €, 90 l, jediný platný interval 500 km so spotrebou 6,00 l/100 km a zachované upozornenie na staršiu medzeru; rovnaký stav aj po opätovnom otvorení |
 
 Doterajšie výsledky potvrdil používateľ v chate 1. 11. 2026 pri vedenom teste v Expo Go. Kontext testu: simulátor iPhone 17, iOS 27.0; presná verzia Expo Go pri tomto teste nebola zisťovaná. Tento scenár neoveruje fyzický iPhone, natívny build, zálohu ani obnovu. Po jeho dokončení nasleduje implementácia zálohy a obnovy.

@@ -1,6 +1,6 @@
 # Prvý funkčný tok v mobilnej aplikácii
 
-Stav k 24. 10. 2026: prvá vývojová verzia Tankuj, nie dokončené MVP ani verzia pripravená na vydanie.
+Stav k 1. 11. 2026: prvá vývojová verzia Tankuj, nie dokončené MVP ani verzia pripravená na vydanie.
 
 ## Dostupné funkcie
 
@@ -45,7 +45,9 @@ Použité API je overené podľa [oficiálnej dokumentácie expo-sqlite](https:/
 - Na iPhone 17 s iOS 27.0 v Expo Go vizuálne overená úvodná obrazovka Tankuj a jej ovládacie prvky. Testovacie tankovania neboli vložené do používateľovej histórie.
 - Pri doplnení úprav a mazania vytvorený samostatný iPhone 17 simulátor Tankuj QA (iOS 27.0). V Expo Go sa podarilo vytvoriť vozidlo Tankuj QA a vyplniť formulár 10 000 km, 40 l, 64 € vrátane náhľadu 1,600 €/l. Uloženie tankovania, prepnutie plnej nádrže, úprava a vymazanie cez mobilné UI ani reštart s tankovaniami nie sú týmto pokusom overené. Ovládací nástroj pri prepínači a posúvaní opakovane hlásil windowNotFoundAtPosition alebo nezmenil UI; ani presun okna medzi displejmi a jeho vycentrovanie problém nevyriešili. Pôvodná používateľova evidencia na iPhone 17 nebola menená.
 
-Testy repository v Node nenahrádzajú úplné overenie expo-sqlite na zariadení. Celý zápis z formulára, reštart aplikácie s údajmi, VoiceOver, veľký text, Android a fyzický iPhone ešte vyžadujú samostatnú kontrolu. Natívny development build ani distribúcia týmto krokom nevznikli.
+Dňa 1. 11. 2026 používateľ úspešne dokončil [vedený manuálny scenár](manual-verification.md) v simulátore cez Expo Go: zápis troch tankovaní, spotreba, úprava a prepočet, zrušenie vymazania, oba dôvody vymazania, zachovanie medzery, obnovenie merania a zachovanie údajov po úplnom zatvorení a opätovnom otvorení aplikácie. Výsledky potvrdil používateľ v chate; agent ich nepozoroval priamo.
+
+Testy repository v Node nenahrádzajú úplné overenie expo-sqlite na zariadení. Úplná kontrola navigácie, VoiceOver, veľký text, Android a fyzický iPhone ešte vyžadujú samostatnú kontrolu. Natívny development build ani distribúcia týmto krokom nevznikli.
 
 ## Zostávajúce funkcie MVP
 
