@@ -10,7 +10,7 @@ Posledná aktualizácia: 1. 11. 2026.
 - Používateľ potvrdil úspešné `npm ci`, 35 testov a spustenie aplikácie cez Expo Go na novom Macu. Agent samostatne zopakoval `npm run typecheck` a `npm test`: typová kontrola aj všetkých 35 doménových/SQLite testov prešli. Node hlási upozornenie MODULE_TYPELESS_PACKAGE_JSON; testy nezlyhali.
 - Agent overil spustený simulátor iPhone 17 s iOS 27.0. Samotná kontrola bežiaceho simulátora neoveruje mobilný tok; výsledky následného manuálneho testu používateľa sú uvedené nižšie. Fyzické zariadenie nebolo testované.
 - Pripravený [manuálny scenár](manual-verification.md) pre pridanie, úpravu, oba dôvody vymazania, spotrebu a zachovanie údajov po ukončení a opätovnom otvorení Expo Go. Používateľ 1. 11. potvrdil uloženie A/B/C a očakávané výsledky: po B 80 € bez spotreby, po C 6,00 l/100 km za 500 km, 1 interval, 112 € a 70 l. Používateľ tiež potvrdil úpravu B na 12 l a 19,20 € s prepočtom na 6,40 l/100 km, 115,20 € a 72 l; všetky kontrolované údaje zostali zachované po úplnom zatvorení Expo Go a opätovnom otvorení Tankuj v simulátore. Používateľ potvrdil aj zrušenie a vykonanie vymazania chybného D bez vzniku medzery, potom vymazanie skutočného B: 2 záznamy, 96 €, 60 l a nedostupná spotreba s upozornením na neúplnú evidenciu. Tento stav zostal zachovaný po úplnom zatvorení a opätovnom otvorení Expo Go. Používateľ napokon potvrdil obnovenie merania C–E: 3 záznamy, 144 €, 90 l, jediný platný interval 500 km so spotrebou 6,00 l/100 km a zachované upozornenie na staršiu medzeru, aj po opätovnom otvorení. Vedený scenár je dokončený; nejde o úplnú kontrolu navigácie, prístupnosti ani fyzického zariadenia.
-- Git neobsahuje SQLite údaje zo starého simulátora. Export a obnova ešte nie sú implementované; sú ďalším krokom po dokončenom manuálnom scenári.
+- Git neobsahuje SQLite údaje zo starého simulátora. JSON záloha a obnova sú teraz implementované; práca so súbormi cez mobilné UI ešte čaká na manuálne overenie. CSV export zostáva otvorený.
 
 ## Cieľ
 
@@ -45,6 +45,7 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Dokončené
 
+- Verzovaná JSON záloha a atomická obnova celého datasetu so zachovaním vozidla, ID, presných vstupov a medzier. Nová obrazovka je dostupná z nastavení aj pred vytvorením vozidla; obsahuje kontrolu súboru, náhľad, možnosť zálohovať súčasné údaje a konečné potvrdenie nahradenia. Detaily a limity sú v [špecifikácii implementácie](backup-and-restore.md). SQLite schéma zostáva v1.
 - Úprava tankovania so zachovaním ID a pôvodného režimu ceny; vymazanie s rozlíšením chyby a skutočného tankovania, dvojstupňovým potvrdením a transakčným zachovaním medzier. Prepočty vychádzajú z aktuálnej histórie. Existujúca SQLite schéma v1 sa nemení.
 - Prvý funkčný mobilný tok: úvod, prehľad, pridanie tankovania, potvrdenie, história, detail a základné štatistiky. UI používa návrh Tankuj a nezačína s demo údajmi.
 - Lokálne ukladanie vozidla, tankovaní a medzier do SQLite; presné centy, mililitre a jednotkové ceny. Výpočty a repository sú oddelené od UI.
@@ -65,6 +66,8 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Overenie
 
+- Pri doplnení JSON zálohy a obnovy 1. 11. 2026 prešla typová kontrola, všetkých 46 doménových/SQLite testov a export iOS JS/Hermes balíka. Nových 11 testov pokrýva validáciu, presné ceny a ID, medzery, nahradenie, odmietnutie pred transakciou, rollback pri chybe v jednotlivých častiach obnovy, opakovanie a zachovanie po opätovnom otvorení databázového súboru. Toto je overenie kódu a SQLite v Node; zdieľanie, výber súboru, potvrdenia a úplná obnova cez Expo Go ani fyzický iPhone zatiaľ neboli overené. Pripravený je [manuálny scenár zálohy](manual-backup-verification.md).
+- Po inštalácii modulov pre súbory aktuálny `npm audit` hlási 15 nálezov (1 low, 11 moderate, 3 high). Nálezy zostávajú otvorené; automatická oprava sa nevykonala.
 - Pri kontrole prototypu prešlo 13 skupín interakčných scenárov v jsdom a 14 výpočtov kontrastu textu voči povrchu. Podrobnosti a obmedzenia sú v [kontrole prototypu](prototype-review.md).
 - Vizuálna kontrola v prehliadači nebola dokončená: dostupný prehliadač odmietol lokálny súbor. Rozloženie, systémová klávesnica a VoiceOver ešte vyžadujú overenie.
 - Historické prostredie na starom Macu: Node.js 24.21.0, npm 11.19.0 a Xcode 27.1 (27A9275). Aktuálne verzie sú uvedené v časti o obnovení vývoja.
@@ -77,7 +80,7 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 - Príčina predchádzajúcich timeoutov simctl openurl nie je potvrdená; aplikácia sa už zobrazila. V tomto kroku sa nemenila sieťová konfigurácia ani sa nemazali dáta simulátora.
 
 - Pred prípravou dokumentácie bol pracovný strom čistý a vetva sledovala `origin/main`.
-- Pri doplnení úprav a mazania prešlo všetkých 35 doménových a SQLite integračných testov. Pokrývajú opravy, oba dôvody mazania, prepočty, presuny pri medzerách, rollback aj zachovanie upravených údajov a medzery po vymazaní pri opätovnom otvorení databázového súboru. Zálohy a potvrdenie úplnosti konkrétnej medzery ešte nie sú implementované.
+- Pri doplnení úprav a mazania prešlo všetkých 35 doménových a SQLite integračných testov. Pokrývajú opravy, oba dôvody mazania, prepočty, presuny pri medzerách, rollback aj zachovanie upravených údajov a medzery po vymazaní pri opätovnom otvorení databázového súboru. Vtedy ešte neboli implementované zálohy ani potvrdenie úplnosti konkrétnej medzery; zálohy pribudli 1. 11., potvrdenie úplnosti zostáva otvorené.
 - Samostatný simulátor Tankuj QA (iPhone 17, iOS 27.0, Expo Go) umožnil vytvoriť testovacie vozidlo a vyplniť formulár s náhľadom ceny. Pri tomto historickom pokuse zostali úplný zápis, úprava, vymazanie cez mobilné UI a reštart s tankovaniami neoverené pre opakované chyby ovládania okna Device Hub; podrobnosti sú v mobile-first-flow.md. Do pôvodnej používateľovej evidencie sa testovacie tankovania nevkladali.
 - Overené lokálne odkazy v Markdown dokumentácii, ukončenia súborov a neprítomnosť nadbytočných medzier na konci riadkov.
 - Natívny build, test na fyzickom zariadení a nasadenie ešte neprebehli.
@@ -86,7 +89,7 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 - Overiť jednoduchosť formulára a zrozumiteľnosť plnej nádrže a medzier na prototype.
 - Zachovanie medzier pri vymazaní a presune je implementované konzervatívnymi bodmi tachometra. Doplniť rozhranie na výslovné potvrdenie úplnosti konkrétneho úseku; samotná oprava alebo doplnenie záznamu medzeru neodstráni.
-- Skontrolovať kompatibilitu vytvorenej šablóny a päť závažných nálezov npm audit hlásených pri inštalácii. Nespúšťať automaticky npm audit fix --force.
+- Skontrolovať kompatibilitu vytvorenej šablóny a aktuálnych 15 nálezov npm audit (1 low, 11 moderate, 3 high; stav 1. 11. 2026). Nespúšťať automaticky npm audit fix --force.
 - Overiť navrhnutý vizuálny systém, úzke displeje a zväčšený text vizuálnou kontrolou a na zariadení.
 - Pred registráciou aplikácie určiť bundle ID a konfiguráciu podpisovania.
 - Pred verejným vydaním overiť názov, zvoliť licenciu repozitára a pripraviť informácie o súkromí.
@@ -94,4 +97,4 @@ Tieto položky rozlišujú výslovnú preferenciu používateľa od pracovných 
 
 ## Ďalší krok
 
-Implementovať verzovanú JSON zálohu a atomickú obnovu podľa MVP: zachovať vozidlo, vstupy, identifikátory aj medzery, pred nahradením údajov validovať súbor a zobraziť náhľad. Následne doplniť CSV export a potvrdenie úplnosti konkrétnej medzery. Vedený manuálny scenár základného toku a zachovania po reštarte je dokončený; širšie overenie navigácie a prístupnosti zostáva otvorené. Skontrolovať nálezy npm audit pred širšou betou. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.
+Manuálne overiť uloženie zálohy do Súborov, zrušenie systémových dialógov, náhľad a konečné potvrdenie, obnovu so zachovaním medzier a následné úplné zatvorenie/otvorenie Expo Go podľa [scenára zálohy](manual-backup-verification.md). Potom doplniť CSV export a potvrdenie úplnosti konkrétnej medzery. Vedený manuálny scenár základného toku a zachovania po reštarte je dokončený; širšie overenie navigácie a prístupnosti zostáva otvorené. Skontrolovať nálezy npm audit pred širšou betou. Dokumentácia ani prototyp nezakladajú súhlas na publikovanie, platené operácie alebo deštruktívne zásahy.

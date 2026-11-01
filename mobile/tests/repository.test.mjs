@@ -7,11 +7,14 @@ import test from 'node:test';
 import {
   createVehicle,
   deleteRefuel,
+  exportBackup,
   initializeDatabase,
   insertRefuel,
   readSnapshot,
+  restoreBackup,
   updateRefuel,
 } from '../src/data/fuel-repository.ts';
+import { parseBackup, serializeBackup } from '../src/domain/backup.ts';
 import { draftFromRefuel, measure, summarize, ValidationError } from '../src/domain/fuel.ts';
 
 function adapter(connection = new DatabaseSync(':memory:')) {
@@ -201,6 +204,122 @@ async function history(task) {
   } finally {
     db.connection.close();
   }
+}
+
+test('export and restore replace the dataset while preserving identities, prices, gaps and results', async () => {
+  await history(async (db, ids) => {
+    const original = await readSnapshot(db);
+    await updateRefuel(db, ids.middle, {
+      ...draftFromRefuel(original.refuels[1]), liters: '10.5', priceMode: 'unit', price: '1.639',
+    }, '2026-11-01');
+    await deleteRefuel(db, ids.first, 'real');
+    const source = await readSnapshot(db);
+    const text = await exportBackup(db);
+    assert.deepEqual(await readSnapshot(db), source, 'export must not change history');
+    const backup = parseBackup(text, '2026-11-01');
+    assert.equal(backup.vehicle.id, 1);
+    // Existing IDs overlap with restored IDs; restore must replace rather than merge.
+    await insertRefuel(db, draft({ odometer: '11000' }), '2026-11-01');
+    const restored = await restoreBackup(db, backup, '2026-11-01');
+    assert.deepEqual(restored, source);
+    assert.deepEqual(measure(restored.refuels, restored.gaps), measure(source.refuels, source.gaps));
+    assert.deepEqual(summarize(restored.refuels, '2026-10'), summarize(source.refuels, '2026-10'));
+    const added = await insertRefuel(db, draft({ odometer: '11000' }), '2026-11-01');
+    assert.ok(added.id > Math.max(...source.refuels.map((r) => r.id)));
+    assert.equal(added.snapshot.refuels.length, source.refuels.length + 1);
+  });
+});
+
+test('invalid restore input is refused before starting a transaction or modifying data', async () => {
+  await history(async (db) => {
+    const before = await readSnapshot(db);
+    const base = parseBackup(await exportBackup(db), '2026-11-01');
+    const transaction = db.withExclusiveTransactionAsync.bind(db);
+    let writes = 0;
+    db.withExclusiveTransactionAsync = async (task) => { writes++; return transaction(task); };
+    for (const mutate of [
+      (b) => { b.version = 2; },
+      (b) => { b.refuels[1].id = b.refuels[0].id; },
+      (b) => { b.refuels[0].volumeMl = 0; },
+      (b) => { b.refuels[0].date = '2030-01-01'; },
+    ]) {
+      const invalid = structuredClone(base); mutate(invalid);
+      await assert.rejects(restoreBackup(db, invalid, '2026-11-01'));
+      assert.deepEqual(await readSnapshot(db), before);
+    }
+    assert.equal(writes, 0);
+  });
+});
+
+test('restore rolls back deletion and every insertion on failures and permits retry', async () => {
+  await history(async (db) => {
+    const before = await readSnapshot(db);
+    const backup = parseBackup(await exportBackup(db), '2026-11-01');
+    backup.vehicle.name = 'Restored auto';
+    backup.gaps = [{ id: 45, atOdometerKm: 10200 }];
+    const run = db.runAsync.bind(db);
+    for (const prefix of ['INSERT INTO vehicle', 'INSERT INTO refuels', 'INSERT INTO coverage_gaps']) {
+      db.runAsync = async (sql, ...params) => {
+        if (sql.startsWith(prefix)) throw new Error('Simulated restore failure');
+        return run(sql, ...params);
+      };
+      await assert.rejects(restoreBackup(db, backup, '2026-11-01'), /Simulated restore failure/);
+      assert.deepEqual(await readSnapshot(db), before);
+    }
+    db.runAsync = run;
+    const after = await restoreBackup(db, backup, '2026-11-01');
+    assert.equal(after.vehicle.name, 'Restored auto');
+    assert.deepEqual(after.gaps.map((gap) => ({ ...gap })), backup.gaps);
+    assert.equal(measure(after.refuels, after.gaps).average, null);
+  });
+});
+
+test('restore to an empty database and restore of an empty backup are supported', async () => {
+  const db = adapter();
+  try {
+    await initializeDatabase(db);
+    const empty = await exportBackup(db);
+    const source = { vehicle: { name: 'Imported', fuel: 'Diesel' }, refuels: [],
+      gaps: [{ id: 9, atOdometerKm: 10000 }] };
+    const restored = await restoreBackup(db, parseBackup(serializeBackup(source)), '2026-11-01');
+    assert.deepEqual(JSON.parse(JSON.stringify(restored)), source);
+    assert.deepEqual(await restoreBackup(db, parseBackup(empty), '2026-11-01'),
+      { vehicle: null, refuels: [], gaps: [] });
+    await createVehicle(db, { name: 'New', fuel: 'Benzín' });
+    assert.equal((await readSnapshot(db)).vehicle.name, 'New');
+  } finally { db.connection.close(); }
+});
+
+test('restored data and a deleted final fill gap survive reopening and affect future measurement', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'tankuj-restore-test-'));
+  let db;
+  try {
+    db = adapter(new DatabaseSync(join(directory, 'tankuj.db')));
+    await initializeDatabase(db);
+    await createVehicle(db, { name: 'Before restore', fuel: 'Diesel' });
+    const first = { id: 80, ...buildTestRefuel() };
+    const source = { vehicle: { name: 'Backup vehicle', fuel: 'Benzín' },
+      refuels: [first], gaps: [{ id: 30, atOdometerKm: 10200 }] };
+    const backup = parseBackup(serializeBackup(source));
+    await restoreBackup(db, backup, '2026-11-01');
+    db.connection.close();
+    db = adapter(new DatabaseSync(join(directory, 'tankuj.db')));
+    await initializeDatabase(db);
+    assert.deepEqual(JSON.parse(JSON.stringify(await readSnapshot(db))), source);
+    const next = await insertRefuel(db, draft({ odometer: '10500', liters: '20', price: '32' }), '2026-11-01');
+    assert.ok(next.id > 80);
+    assert.equal(measure(next.snapshot.refuels, next.snapshot.gaps).average, null);
+    const last = await insertRefuel(db, draft({ odometer: '11000', liters: '30', price: '48' }), '2026-11-01');
+    assert.equal(measure(last.snapshot.refuels, last.snapshot.gaps).average, 6);
+  } finally {
+    db?.connection.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+function buildTestRefuel() {
+  return { date: '2026-10-24', odometerKm: 10000, volumeMl: 40000, amountCents: 6400,
+    full: true, priceMode: 'amount', unitPriceMilli: null };
 }
 
 test('editing preserves IDs and recalculates payments and consumption from corrected inputs', async () => {

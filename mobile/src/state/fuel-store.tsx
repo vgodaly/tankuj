@@ -6,9 +6,11 @@ import type { ReactNode } from 'react';
 import {
   createVehicle,
   deleteRefuel,
+  exportBackup,
   initializeDatabase,
   insertRefuel,
   readSnapshot,
+  restoreBackup,
   updateRefuel,
 } from '@/data/fuel-repository';
 import type { DeleteReason, RefuelDraft, Snapshot, Vehicle } from '@/domain/fuel';
@@ -37,6 +39,8 @@ type FuelStore = Snapshot & {
   saveRefuel: (draft: RefuelDraft) => Promise<number>;
   editRefuel: (id: number, draft: RefuelDraft) => Promise<void>;
   removeRefuel: (id: number, reason: DeleteReason) => Promise<void>;
+  getBackup: () => Promise<string>;
+  restore: (backup: unknown) => Promise<void>;
 };
 const FuelContext = createContext<FuelStore | null>(null);
 const EMPTY: Snapshot = { vehicle: null, refuels: [], gaps: [] };
@@ -107,6 +111,24 @@ export function FuelProvider({ children }: { children: ReactNode }) {
       writing.current = false;
     }
   }, []);
+  const getBackup = useCallback(async () => {
+    if (writing.current) throw new Error('Ukladanie už prebieha.');
+    writing.current = true;
+    try {
+      return await exportBackup(await database());
+    } finally {
+      writing.current = false;
+    }
+  }, []);
+  const restore = useCallback(async (backup: unknown) => {
+    if (writing.current) throw new Error('Ukladanie už prebieha.');
+    writing.current = true;
+    try {
+      setSnapshot(await restoreBackup(await database(), backup));
+    } finally {
+      writing.current = false;
+    }
+  }, []);
   return (
     <FuelContext
       value={{
@@ -118,6 +140,8 @@ export function FuelProvider({ children }: { children: ReactNode }) {
         saveRefuel,
         editRefuel,
         removeRefuel,
+        getBackup,
+        restore,
       }}
     >
       {children}

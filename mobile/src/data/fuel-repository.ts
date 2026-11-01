@@ -1,4 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
+import { serializeBackup, validateBackup } from '../domain/backup.ts';
 import { buildRefuel, gapAnchorsForEdit, localToday } from '../domain/fuel.ts';
 import type {
   CoverageGap,
@@ -147,6 +148,42 @@ export async function deleteRefuel(db: Db, id: number, reason: DeleteReason): Pr
     if (!record) throw new Error('Tankovanie už neexistuje.');
     await transaction.runAsync('DELETE FROM refuels WHERE id = ?', id);
     if (reason === 'real') await addGap(transaction, record.odometerKm);
+    result = await readSnapshot(transaction);
+  });
+  return result!;
+}
+
+export async function exportBackup(db: Db): Promise<string> {
+  let result = '';
+  await db.withExclusiveTransactionAsync(async (transaction) => {
+    result = serializeBackup(await readSnapshot(transaction));
+  });
+  return result;
+}
+
+export async function restoreBackup(db: Db, value: unknown, today = localToday()): Promise<Snapshot> {
+  // Validate again at the repository boundary before changing any local data.
+  const backup = validateBackup(value, today);
+  let result: Snapshot | undefined;
+  await db.withExclusiveTransactionAsync(async (transaction) => {
+    await transaction.runAsync('DELETE FROM refuels');
+    await transaction.runAsync('DELETE FROM coverage_gaps');
+    await transaction.runAsync('DELETE FROM vehicle');
+    if (backup.vehicle) {
+      await transaction.runAsync('INSERT INTO vehicle (id, name, fuel) VALUES (1, ?, ?)',
+        backup.vehicle.name, backup.vehicle.fuel);
+    }
+    for (const record of backup.refuels) {
+      await transaction.runAsync(
+        'INSERT INTO refuels (id, date, odometer_km, volume_ml, amount_cents, is_full, price_mode, unit_price_milli) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        record.id, record.date, record.odometerKm, record.volumeMl, record.amountCents,
+        Number(record.full), record.priceMode, record.unitPriceMilli,
+      );
+    }
+    for (const gap of backup.gaps) {
+      await transaction.runAsync('INSERT INTO coverage_gaps (id, at_odometer_km) VALUES (?, ?)',
+        gap.id, gap.atOdometerKm);
+    }
     result = await readSnapshot(transaction);
   });
   return result!;

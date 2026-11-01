@@ -14,6 +14,7 @@ import {
   Page,
   RecordRow,
   SectionTitle,
+  TextButton,
   usePalette,
 } from '@/components/tankuj-ui';
 import { localToday, measure, measurementHelp, summarize } from '@/domain/fuel';
@@ -104,6 +105,7 @@ function Onboarding() {
       />
       {error ? <Copy error>{error}</Copy> : null}
       <Button title="Začať zapisovať" onPress={start} busy={busy} />
+      <TextButton title="Mám zálohu – obnoviť údaje" disabled={busy} onPress={() => router.push('/backup')} />
       <Copy small muted>
         História sa ukladá v tomto telefóne. Prístup k polohe ani registráciu nepotrebuješ.
       </Copy>

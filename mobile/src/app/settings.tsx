@@ -32,10 +32,15 @@ export default function Settings() {
           chýbajúcom tankovaní začneme od novej plnej nádrže.
         </Copy>
       </Card>
+      <Card>
+        <SectionTitle>Tvoje údaje</SectionTitle>
+        <Copy>Vytvor si zálohu histórie alebo obnov údaje zo súboru.</Copy>
+        <TextButton title="Záloha a obnova →" onPress={() => router.push('/backup')} />
+      </Card>
       <SectionTitle>Prvá vývojová verzia</SectionTitle>
       <Copy small muted>
-        Údaje sa ukladajú lokálne v tomto telefóne. Export a obnova zálohy ešte nie sú dostupné.
-        Túto verziu zatiaľ používaj na skúšanie, nie ako jedinú kópiu svojej histórie.
+        Údaje sa ukladajú lokálne v tomto telefóne. Zálohy vytváraš manuálne; automatická
+        synchronizácia ani CSV export zatiaľ nie sú dostupné.
       </Copy>
     </Page>
   );
