@@ -1,6 +1,6 @@
 # Manuálne overenie mobilného toku
 
-Pripravené 1. 11. 2026. Stav: **nevykonané**, čaká na výsledky používateľa.
+Pripravené 1. 11. 2026. Stav: **čiastočne overené používateľom**, pridanie A/B/C a prvá spotreba prešli; ostatné kroky čakajú na overenie.
 Automatizované testy v Node nenahrádzajú tento test UI a expo-sqlite.
 
 ## Príprava
@@ -45,8 +45,8 @@ História má obsahovať práve tri záznamy v poradí C, B, A. Štatistiky po C
 
 | Oblasť | Výsledok |
 | --- | --- |
-| Pridanie A/B/C a navigácia | Neoverené |
-| Spotreba a súhrny | Neoverené |
+| Pridanie A/B/C a navigácia | Používateľ potvrdil úspešné uloženie A, B a C; úplná kontrola navigácie ešte nepotvrdená |
+| Spotreba a súhrny | Prešlo podľa používateľa: po B 80 € bez spotreby; po C 6,00 l/100 km, 500 km, 1 interval, 112 € a 70 l |
 | Úprava B | Neoverené |
 | Zachovanie úpravy po reštarte | Neoverené |
 | Zrušenie vymazania a odstránenie chybného D | Neoverené |
@@ -54,4 +54,4 @@ História má obsahovať práve tri záznamy v poradí C, B, A. Štatistiky po C
 | Zachovanie vymazania a medzery po reštarte | Neoverené |
 | Obnovenie merania C–E a posledný reštart | Neoverené |
 
-Pri výsledkoch doplniť dátum, zariadenie, iOS, Expo Go a kto test vykonal. Tento scenár neoveruje fyzický iPhone, natívny build, zálohu ani obnovu. Po jeho dokončení nasleduje implementácia zálohy a obnovy.
+Doterajšie výsledky potvrdil používateľ v chate 1. 11. 2026 pri vedenom teste v Expo Go. Kontext testu: simulátor iPhone 17, iOS 27.0; presná verzia Expo Go pri tomto teste nebola zisťovaná. Tento scenár neoveruje fyzický iPhone, natívny build, zálohu ani obnovu. Po jeho dokončení nasleduje implementácia zálohy a obnovy.
