@@ -1,6 +1,6 @@
 # Manuálne overenie mobilného toku
 
-Pripravené 1. 11. 2026. Stav: **čiastočne overené používateľom**, pridanie A/B/C a prvá spotreba prešli; ostatné kroky čakajú na overenie.
+Pripravené 1. 11. 2026. Stav: **čiastočne overené používateľom**, pridanie A/B/C, spotreba, úprava B a zachovanie po reštarte prešli; mazanie a zachovanie medzier čakajú na overenie.
 Automatizované testy v Node nenahrádzajú tento test UI a expo-sqlite.
 
 ## Príprava
@@ -47,8 +47,8 @@ História má obsahovať práve tri záznamy v poradí C, B, A. Štatistiky po C
 | --- | --- |
 | Pridanie A/B/C a navigácia | Používateľ potvrdil úspešné uloženie A, B a C; úplná kontrola navigácie ešte nepotvrdená |
 | Spotreba a súhrny | Prešlo podľa používateľa: po B 80 € bez spotreby; po C 6,00 l/100 km, 500 km, 1 interval, 112 € a 70 l |
-| Úprava B | Neoverené |
-| Zachovanie úpravy po reštarte | Neoverené |
+| Úprava B | Prešlo podľa používateľa: 12 l, 19,20 €, 3 záznamy, spotreba 6,40 l/100 km, platby 115,20 € a objem 72 l |
+| Zachovanie úpravy po reštarte | Prešlo podľa používateľa: úplne zatvoril Expo Go v simulátore, znovu ho otvoril a vybral Tankuj; všetky kontrolované údaje zostali zachované |
 | Zrušenie vymazania a odstránenie chybného D | Neoverené |
 | Odstránenie skutočného B a medzera | Neoverené |
 | Zachovanie vymazania a medzery po reštarte | Neoverené |
