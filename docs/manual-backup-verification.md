@@ -28,7 +28,7 @@ Použi testovaciu históriu po [základnom scenári](manual-verification.md): A 
 | Úplná obnova, ceny, súhrny a medzery | Prešlo podľa používateľa: E sa vrátil z 50 € na 48 €, platby zo 146 € na 144 €; 3 tankovania, 90 l, spotreba 6,00 l/100 km za 500 km, 1 interval a upozornenie na staršiu medzeru |
 | Zachovanie obnovy po zatvorení/otvorení | Prešlo podľa používateľa: rovnaký obnovený stav po úplnom zatvorení a otvorení Expo Go |
 | Neplatný súbor/verzia nemení dáta | Prešlo pri samostatnom UI teste agenta: obe očakávané chyby, odstránený pôvodný náhľad, 3 tankovania; následne overené 144 €, 90 l, 6,00 l/100 km, 1 interval za 500 km a zachovaná medzera |
-| Obnova pri prvom spustení | Neoverené |
+| Obnova pri prvom spustení | Prešlo pri samostatnom UI teste agenta na novom Tankuj Restore QA: vstup bez vozidla a s 0 tankovaniami, náhľad, potvrdená obnova a zachovanie po úplnom ukončení/otvorení Expo Go |
 
 ## Súbory pre negatívne overenie
 
@@ -44,3 +44,11 @@ V Node bolo overené odmietnutie oboch súborov s uvedenými správami bez prís
 Rutinné technické kontroly má najprv vykonávať agent dostupnými nástrojmi. Používateľské testovanie sa sústredí na zrozumiteľnosť a pohodlie používania; obmedzenie ovládania sa musí uviesť konkrétne pred odovzdaním kontroly používateľovi.
 
 Pri tomto pokuse pripojenie k Device Hub cez bundle ID dvakrát vypršalo. Následné pripojenie cez názov „Device Hub“ po načítaní Findera uspelo. Bežné obrazovky Tankuj sa dali ovládať cez prístupnostný strom; systémový výber súboru vyžadoval snímky a súradnice s overením mierky. Údaje aplikácie ani systémové nastavenia sa kvôli pripojeniu nemenili.
+
+## Obnova pri prvom spustení – výsledok
+
+Dňa 1. 11. 2026 agent vytvoril samostatný nový simulátor **Tankuj Restore QA**, iPhone 17, iOS 27.0, ID `713A77C0-1691-46F1-ABFE-6153305C5B42`, a nainštaloval existujúcu oficiálnu kópiu Expo Go 58.0.7. Pôvodný simulátor ani jeho databáza sa nemenili. Do Súborov QA zariadenia sa skopírovala uložená testovacia JSON záloha.
+
+Agent cez UI overil úvod Tankuj, vstup „Mám zálohu – obnoviť údaje“, stav bez vozidla s 0 tankovaniami, náhľad vozidla a 3 tankovaní s 1 medzerou, konečné potvrdenie a úspešnú obnovu. V prepínači aplikácií úplne ukončil Expo Go, spustil ho znova a otvoril Tankuj. Po studenom spustení zostali vozidlo, 3 tankovania, 144 €, 90 l, cena 1,600 €/l, jediný interval 500 km so spotrebou 6,00 l/100 km a upozornenie na medzeru. Read-only kontrola natívneho SQLite súboru navyše potvrdila zhodu vozidla, ID, presných vstupov a medzier s JSON zálohou.
+
+Ide o agentom vykonaný test UI a natívnej SQLite databázy v simulátore cez Expo Go, nie o fyzický iPhone, vlastný natívny build ani nový automatizovaný regresný test. QA simulátor zostáva dostupný na ďalšie technické kontroly.
