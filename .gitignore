@@ -27,7 +27,7 @@ node_modules/
 *.provisionprofile
 *.jks
 *.keystore
-/credentials.json
+credentials.json
 
 # Logs
 *.log
@@ -45,5 +45,5 @@ pnpm-debug.log*
 *~
 
 # Keep dependency lockfiles and shared editor settings versioned.
-# Native ios/ and android/ sources are not ignored here; decide how to
-# manage generated native projects when setting up the Expo application.
+# mobile/.gitignore excludes generated ios/ and android/ projects; shared
+# native configuration belongs in app.json and config plugins (Expo CNG).

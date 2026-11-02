@@ -17,7 +17,7 @@ Z koreňa repozitára:
 ~~~bash
 cd mobile
 npm ci
-npm start
+npm run start:go
 ~~~
 
 V ponuke Expo vyber iOS simulátor klávesmi Shift + i. Typová kontrola v priečinku mobile:
@@ -26,6 +26,8 @@ V ponuke Expo vyber iOS simulátor klávesmi Shift + i. Typová kontrola v prie�
 npm run typecheck
 npm test
 ~~~
+
+Vlastný iOS development build na Macu pripravuje [postup zostavenia](docs/ios-development-build.md), vrátane prenosu histórie z Expo Go. `npm run ios` zostavuje samostatnú aplikáciu, `npm start` potom spúšťa jej Metro server; `npm run start:go` zachováva možnosť otvoriť pôvodnú evidenciu v Expo Go.
 
 Pôvodné licenčné oznámenie prevzatej Expo šablóny je zachované v [mobile/LICENSE](mobile/LICENSE). Licencia vlastného projektu Tankuj zatiaľ nebola zvolená.
 

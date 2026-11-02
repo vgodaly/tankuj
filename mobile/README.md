@@ -8,10 +8,12 @@ V tomto priečinku:
 
 ~~~bash
 npm ci
-npm start
+npm run start:go
 ~~~
 
 V ponuke Expo stlač Shift + i a vyber klasický iPhone. Po prvom otvorení vyber palivo a voliteľne pomenuj auto. Aplikácia nemá predvyplnené demo tankovania.
+
+Pre samostatný iOS development build na Macu slúži `npm run ios`; po jeho nainštalovaní `npm start` spustí Metro pre vlastnú aplikáciu. Konfiguráciu, výber QA simulátora, podpisovanie a prenos histórie z Expo Go opisuje [postup iOS buildu](../docs/ios-development-build.md). Používateľ potvrdil bundle ID `com.vgodaly.tankuj`.
 
 ## Kontroly
 
@@ -33,7 +35,7 @@ Testy používajú vstavaný test runner a SQLite v Node.js. Nevyžadujú simul�
 
 ## Rozsah a obmedzenia
 
-Funguje nastavenie auta, pridanie tankovania, prehľad, história, detail a základné štatistiky. Úpravy, vymazanie, grafy a export/obnova zálohy zatiaľ nie sú implementované. Túto verziu používaj na vývoj a skúšanie; zatiaľ nemá byť jedinou kópiou skutočnej histórie.
+Funguje nastavenie auta, pridanie, úprava a vymazanie tankovania, kontext susedov, prehľad, história, detail, grafy štatistík a kontrola medzier. Dáta sa ukladajú lokálne do SQLite; dostupné sú CSV export a JSON záloha s obnovou. Rozsah overenia na simulátore, vlastnom builde a fyzickom iPhone sa rozlišuje v projektovom stave. Históriu pravidelne zálohuj; automatická synchronizácia nie je implementovaná.
 
 Podrobnosti sú v [prvom funkčnom toku](../docs/mobile-first-flow.md), [špecifikácii MVP](../docs/mvp.md) a [pravidlách výpočtov](../docs/calculations.md).
 
