@@ -283,12 +283,14 @@ export function Field({
   label,
   error,
   help,
+  preserveHelpOnError = false,
   inputRef,
   ...props
 }: TextInputProps & {
   label: string;
   error?: string;
   help?: string;
+  preserveHelpOnError?: boolean;
   inputRef?: Ref<ComponentRef<typeof TextInput>>;
 }) {
   const c = usePalette();
@@ -298,7 +300,7 @@ export function Field({
       <TextInput
         ref={inputRef}
         accessibilityLabel={label}
-        accessibilityHint={error || help}
+        accessibilityHint={error && preserveHelpOnError ? [error, help].filter(Boolean).join(' ') : error || help}
         autoCorrect={false}
         autoCapitalize="none"
         placeholderTextColor={c.muted}
@@ -321,7 +323,8 @@ export function Field({
         <Copy small error>
           {error}
         </Copy>
-      ) : help ? (
+      ) : null}
+      {help && (!error || preserveHelpOnError) ? (
         <Copy small muted>
           {help}
         </Copy>

@@ -6,6 +6,7 @@ import {
 import {
   Button,
   Copy,
+  countLabel,
   dateLabel,
   Field,
   formatNumber,
@@ -26,6 +27,7 @@ import {
   ValidationError,
 } from '@/domain/fuel';
 import type { FieldErrors, Refuel, RefuelDraft } from '@/domain/fuel';
+import { refuelContext } from '@/domain/refuel-context';
 import { useFuel } from '@/state/fuel-store';
 
 function isoDate(value: string) {
@@ -159,7 +161,23 @@ function RefuelEditor({ record }: { record?: Refuel }) {
         ? 'Vypočítaná cena: ' + formatNumber((price * 10) / liters, 3) + ' €/l'
         : 'Vypočítaná suma: ' + money(centsFromUnitPrice(liters, price));
   }
-  const last = refuels.at(-1);
+  const context = refuelContext(
+    { date: isoDate(draft.date), odometer: draft.odometer }, refuels, record?.id,
+  );
+  const neighborLabel = (item: Refuel) =>
+    dateLabel(item.date) + ' · ' + formatNumber(item.odometerKm, 0) + ' km';
+  const odometerHelp = context.kind === 'invalid-date'
+    ? 'Pre zobrazenie susedných tankovaní zadaj platný dátum, najneskôr dnešný.'
+    : context.kind === 'needs-odometer'
+      ? `V tento deň máš ${countLabel(context.sameDayCount, 'tankovanie', 'tankovania', 'tankovaní')}. Na určenie poradia doplň platný tachometer.`
+      : [
+          context.previous ? 'Predchádzajúce tankovanie: ' + neighborLabel(context.previous) + '.' : '',
+          context.next ? 'Nasledujúce tankovanie: ' + neighborLabel(context.next) + '.' : '',
+          context.duplicate ? 'Tento tachometer už má tankovanie: ' + neighborLabel(context.duplicate) + '.' : '',
+          !context.previous && !context.next && !context.duplicate
+            ? record ? 'Toto je jediné tankovanie v evidencii.'
+              : 'Toto bude prvé tankovanie v evidencii. Zadaj aktuálny stav na palubnej doske.' : '',
+        ].filter(Boolean).join('\n');
   let movingGap = false;
   if (record) {
     try {
@@ -205,11 +223,8 @@ function RefuelEditor({ record }: { record?: Refuel }) {
         maxLength={12}
         editable={!busy}
         error={errors.odometer}
-        help={
-          last
-            ? 'Posledný záznam: ' + formatNumber(last.odometerKm, 0) + ' km'
-            : 'Aktuálny stav na palubnej doske.'
-        }
+        preserveHelpOnError
+        help={odometerHelp}
       />
       <Field
         inputRef={litersRef}

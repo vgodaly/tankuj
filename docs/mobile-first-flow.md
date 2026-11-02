@@ -9,6 +9,7 @@ Stav k 1. 11. 2026: prvá vývojová verzia Tankuj, nie dokončené MVP ani verz
 - Pridanie tankovania: tachometer, litre, suma alebo jednotková cena, plná nádrž, dátum a označenie vynechaného tankovania.
 - Dátum je predvyplnený; upravuje sa v ďalších možnostiach vo formáte deň.mesiac.rok. Natívny dátumový picker ešte nie je pridaný.
 - Validácia vstupov aj chronológie, potvrdenie zahodenia zmien a ochrana pred opakovaným uložením.
+- [Kontext susedných tankovaní](refuel-context.md): pri pridávaní aj úprave dátum a tachometer predchodcu/nasledovníka, priebežný prepočet, pomenovanie duplicity a vysvetlenie pri chýbajúcom vstupe. Pomoc pri tachometri zostáva dostupná aj pri validačnej chybe.
 - Potvrdenie zápisu, história, detail a štatistiky. [Tri pruhové grafy](statistics-charts.md) spotreby po platných intervaloch, efektívnych cien a mesačných platieb, s číslami, mierkou a stránkovaním po šiestich položkách.
 - Úprava z detailu v rovnakom formulári: pôvodná suma alebo zadaná jednotková cena, litre, tachometer, dátum a plná nádrž; ID sa nemení. Kontrola chronológie vynechá iba práve upravovaný záznam.
 - Vymazanie z detailu: výber chybného/duplicitného záznamu alebo skutočného tankovania, potom potvrdenie s dátumom, tachometrom a sumou. Skutočné tankovanie po odstránení zanechá medzeru. Vymazanie zatiaľ nemá funkciu späť.
@@ -41,6 +42,7 @@ Použité API je overené podľa [oficiálnej dokumentácie expo-sqlite](https:/
 
 ## Overenie
 
+- Po doplnení [kontextu formulára](refuel-context.md) 2. 11. prešli typy, 75 testov (6 nových) a iOS export. V QA agent overil susedov pri úprave, zmenu kilometrov/dátumu, duplicitu a odmietnutie uloženia s ponechanou pomocou, prázdny vstup a dnešný nový formulár. Dočasné zmeny zahodil; história a súhrny sa nezmenili. Presný rozsah veľkého textu a limity sú v špecifikácii.
 - Nadväzujúca [kontrola VoiceOver a výsledkov](ui-accessibility-review.md#nadväzujúca-kontrola-výsledkov-a-voiceover): výsledky súborových operácií sú hore a dostávajú fokus; so zapnutým VoiceOver agent pozoroval rámik na výsledku po zrušení zdieľania CSV. Overil chybu nesprávneho formátu, platný náhľad a jeho zrušenie, ochranu neuloženého formulára cez tlačidlo. Návrat gestom a celý výber súboru s VoiceOver zostávajú otvorené. Prešli typy, 69 testov a iOS export; reč ani fyzický iPhone neboli overené.
 - [Úzke rozloženie a veľký text](responsive-layout-review.md): opravené zalamovanie veľkých súm, nadpisov a volieb. Cielene skúšaný obsah so šírkou 320 bodov a klávesnica na samostatnom iPhone 13 mini pri bežnom aj najväčšom texte. Prešli typy, 69 testov a iOS export; nejde o celý tok na 320-bodovom zariadení ani skúšku VoiceOver či fyzického iPhonu.
 - Po doplnení grafov prešli typy, 69 testov a iOS export. Agent overil aktuálne QA hodnoty a pomocou dočasných dát iba pre zobrazenie aj stránkovanie, nuly, medzeru, prázdny stav a prvé čiastočné tankovanie. Overené veľký text a tmavý mesačný graf; detaily a limity sú v [grafoch štatistík](statistics-charts.md).

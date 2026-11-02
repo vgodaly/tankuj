@@ -39,7 +39,7 @@ Prístupnostný strom potvrdzuje názvy a niektoré stavy, nie kvalitu hovorený
 
 Následná [kontrola úzkeho rozloženia](responsive-layout-review.md) doplnila prispôsobenie veľkých súm a nadpisov, voľby a prepínače pod sebou pri veľkom texte a skúšku klávesnice na iPhone 13 mini. Rozlišuje dočasný obsah so šírkou 320 bodov od natívneho rozmeru zariadenia.
 
-Zostáva celý tok pri šírke 320 bodov, celá aplikácia pri najväčšom texte, VoiceOver gestá, návrat gestom, fokus po navigácii a oznamy pri chybách súborov. Pri úprave staršieho tankovania formulár zatiaľ uvádza iba posledný záznam; kontext časových susedov zostáva ďalším vylepšením podľa návrhu UX. Hlavný tok uloženia, mazania a súborových operácií už má samostatné overenia v projektovom stave.
+Zostáva celý tok pri šírke 320 bodov, celá aplikácia pri najväčšom texte, VoiceOver gestá, návrat gestom, fokus po navigácii a oznamy pri chybách súborov. [Kontext časových susedov](refuel-context.md) bol následne implementovaný 2. 11.; pri chybe tachometra zostáva pomoc viditeľná aj v prístupnostnom hinte. Hlavný tok uloženia, mazania a súborových operácií už má samostatné overenia v projektovom stave.
 
 ## Nadväzujúca kontrola výsledkov a VoiceOver
 
