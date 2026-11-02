@@ -1,6 +1,6 @@
 # Vlastný iOS vývojový build
 
-Overené 2. 11. 2026. Pracovný postup je lokálne zostavenie na Macu cez Expo CLI a Xcode. Cloudový EAS build, Apple registrácia a TestFlight nie sú súčasťou tohto kroku.
+Overené 2. 11. 2026. Pracovný postup je lokálne zostavenie na Macu cez Expo CLI a Xcode. Cloudový EAS build a TestFlight nie sú súčasťou tohto kroku. Následná príprava podpisovania pre zariadenie je uvedená nižšie.
 
 ## Konfigurácia a nástroje
 
@@ -8,7 +8,7 @@ Overené 2. 11. 2026. Pracovný postup je lokálne zostavenie na Macu cez Expo C
 - Xcode 27.2; pre natívne závislosti CocoaPods cez Homebrew (`brew install cocoapods`). Node.js 24 a npm podľa projektového stavu.
 - Používateľ potvrdil bundle ID `com.vgodaly.tankuj`, uložené v `mobile/app.json` → `expo.ios.bundleIdentifier`. Schéma odkazu vlastnej aplikácie je `tankuj`. Samotná konfigurácia nepotvrdzuje dostupnosť ID v Apple Developer.
 - Natívne priečinky `mobile/ios` a `mobile/android` sú generované a ignorované cez `mobile/.gitignore`. Zdrojom konfigurácie je `app.json`, balíky a config pluginy. Ručné natívne úpravy treba previesť do pluginu pred ďalším generovaním.
-- Certifikáty, profily a `credentials.json` sa necommitujú. Apple Team ani prihlasovacie údaje sa do projektu teraz nepridávajú.
+- Používateľ schválil vývojové podpisovanie tímom Viktor Godály. `expo.ios.appleTeamId` je `P84RJ936C7`; je to identifikátor tímu, nie prihlasovací údaj. Certifikáty, súkromné kľúče, profily a `credentials.json` sa necommitujú. Prihlásenie je lokálne v Xcode, súkromný podpisovací kľúč v Kľúčenke.
 
 Postup vychádza z [lokálnych development buildov Expo](https://docs.expo.dev/develop/development-builds/introduction/?buildenv=build-locally) a [lokálneho zostavenia](https://docs.expo.dev/guides/local-app-development/). Konkrétne prepínače overujeme aj cez `npx expo run:ios --help` a `npx expo prebuild --help` nainštalovanej verzie CLI.
 
@@ -45,7 +45,31 @@ V samostatnom Tankuj potom zvoľ „Mám zálohu – obnoviť údaje“, skontro
 
 ## Fyzický iPhone
 
-Bundle ID je potvrdený; ďalším krokom je v Xcode zvoliť používateľov Apple Team a podpísať build pre konkrétne zariadenie. Prvý pokus vykonáme spolu s používateľom; nebude sa automaticky registrovať aplikácia ani vytvárať distribučné certifikáty. iPhone musí byť pripojený, odomknutý a pripravený na vývoj. Na tento krok nadväzuje kontrola skutočnej klávesnice, VoiceOver, návratových gest, súborov a zachovania údajov po aktualizácii.
+Používateľ sa prihlásil v Xcode a výslovne schválil priradenie tímu, vytvorenie vývojového certifikátu/profilu a registráciu identifikátora Tankuj a pripojeného zariadenia. Tím je nastavený v Expo konfigurácii aj lokálnom generovanom projekte. Xcode vytvorilo platnú identitu Apple Development. Pri prvom pokuse profil nevznikol: tím hlásil 0 registrovaných zariadení a chýbajúci profil. Používateľ potom pripojil iPhone 13 s iOS 27.0; káblové spojenie a párovanie sú overené. Developer Mode je vypnutý a používateľ ho zatiaľ nechce zapnúť. Inštalácia a test na zariadení sú preto odložené; profil a podpis zariadenia ešte nie sú overené. Distribučný certifikát ani TestFlight sa nepripravujú.
+
+1. Pripoj iPhone dátovým káblom a odomkni ho. Pri prvom spojení používateľ potvrdí dôveru Macu na telefóne. Ak ho Xcode nevidí, najprv over zobrazenie vo Finderi v časti Locations/Miesta; kábel určený iba na nabíjanie nestačí.
+2. Otvor `mobile/ios/Tankuj.xcworkspace`, nie samostatný projekt Pods. V targete Tankuj → Signing & Capabilities má byť tím Viktor Godály, bundle ID `com.vgodaly.tankuj` a automatické podpisovanie. V ponuke cieľov vyber konkrétny fyzický iPhone. Pri prvom pokuse môže Xcode dokončovať prípravu zariadenia.
+3. Ak zariadenie vyžaduje Developer Mode, používateľ ho zapne v Nastavenia → Súkromie a bezpečnosť → Režim vývojára, dokončí reštart a potvrdenie na telefóne. Ide o samostatnú zmenu bezpečnostného nastavenia; nevykonávame ju bez jeho potvrdenia. Podrobnosti: [Apple Developer Mode](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device).
+4. Až keď je zariadenie dostupné, dokonči automatické podpisovanie. Postup a vytváranie lokálnych certifikátov opisuje [Expo: Xcode signing](https://github.com/expo/fyi/blob/main/setup-xcode-signing.md). Ak chýba profil, v Signing & Capabilities skontroluj konkrétnu chybu; chýbajúce zariadenie nevyrieši reset simulátora ani opakovanie `npm ci`.
+5. V priečinku `mobile` spusti `npm run ios -- --device "<názov alebo UDID fyzického iPhonu>"`. Pri prvom spustení treba nový build pre iPhone; binárka iPhoneSimulator nie je použiteľná na telefóne. Metro poskytuje JavaScript pre tento Debug build; na prvé pripojenie skontroluj dosiahnuteľnosť servera z telefónu a prípadnú žiadosť aplikácie o lokálnu sieť.
+
+Pred testovaním skutočnej histórie ulož JSON zálohu a ponechaj ju mimo kontajnera aplikácie. Testovacie tankovania vkladaj iba do dohodnutej prázdnej QA evidencie. Expo Go zostáva oddelené; samostatný Tankuj otvor cez jeho vlastnú ikonu.
+
+## Kontrola na fyzickom zariadení
+
+Výsledky zapisuj s modelom/iOS, konfiguráciou buildu, pozorovateľom a skutočnými hodnotami. Tabuľka je plán, nie potvrdenie vykonania.
+
+| Skúška | Podmienka úspechu | Stav |
+| --- | --- | --- |
+| Prvý štart a podpisovanie | Samostatný Tankuj sa otvorí na konkrétnom iPhone, správny identifikátor a evidencia | Odložené: používateľ ponechal Developer Mode vypnutý |
+| Zápis, úprava, oba dôvody vymazania | [Základný QA scenár](manual-verification.md), rovnaké súhrny a medzery; namiesto Expo Go ukončovať samostatný Tankuj | Nevykonané |
+| Klávesnica a veľký text | Aktívne polia aj uloženie dostupné; čitateľné sumy, grafy a vysvetlenia | Nevykonané |
+| Návrat gestom a neuložené zmeny | Skutočné gesto od ľavého okraja; pokračovanie aj zahodenie zmien fungujú a nič sa samovoľne neuloží | Nevykonané |
+| VoiceOver | Hovorené názvy, poradie, chyby, úspešné oznamy aj výber a zdieľanie súboru; rozlíšiť od rámika fokusu | Nevykonané |
+| JSON a CSV | [Súborový scenár](manual-backup-verification.md), nájdený trvalý súbor, správna obnova a čitateľné CSV | Nevykonané |
+| Studený štart | Úplne ukončiť samostatný Tankuj cez prepínač aplikácií a znova otvoriť; rovnaká evidencia. Pri Debug ponechať Metro dostupné | Nevykonané |
+| Aktualizácia vlastnej aplikácie | Po zálohe nainštalovať nový podpísaný build s rovnakým bundle ID cez existujúci bez odinštalovania; rovnaké vozidlo, ID, vstupy, súhrny a medzery | Nevykonané |
+| Štart bez Metro | Samostatne zostaviť a podpísať Release s pribaleným JS a testovať po vypnutí servera. Debug s Metro nepotvrdzuje úplný offline štart | Nevykonané |
 
 ## Stav overenia
 
@@ -54,4 +78,5 @@ Bundle ID je potvrdený; ďalším krokom je v Xcode zvoliť používateľov App
 - Binárka: `/private/tmp/tankuj-ios-build/Tankuj.app`, overený identifikátor `com.vgodaly.tankuj` a platforma iPhoneSimulator. Výstup v dočasnom priečinku je obnoviteľný build, nie záloha ani distribučný archív.
 - UI: samostatný Tankuj nainštalovaný na Tankuj Restore QA (iPhone 17, iOS 27.0), otvorený cez vlastnú ikonu a pripojený k Metro. Začal bez vozidla. Agent cez systémový výber súboru načítal skúšobnú JSON zálohu, skontroloval náhľad a obnovil ju do prázdneho kontajnera. UI zobrazilo Seat, 3 tankovania, 144 €, 90 l, 1,600 €/l, 6,00 l/100 km za 500 km/1 interval a upozornenie na medzeru. Read-only SQLite potvrdila ID, presné vstupy a bod medzery pri 10 200 km; oddelená QA evidencia Expo Go zostala na 4 tankovaniach, 163,20 €, 102 l a bez medzier.
 - Reštart: agent úplne vypol a zapol iba QA simulátor, cez vyhľadanie vlastnej ikony znovu otvoril Tankuj a overil rovnaké súhrny, spotrebu aj upozornenie na medzeru. Metro počas tohto testu bežalo; nešlo o Reload. Po skúške boli Metro aj QA simulátor vypnuté.
-- Fyzické zariadenie, podpisovanie Apple Team, aktualizácia už nainštalovanej vlastnej aplikácie, úplný VoiceOver, okrajové gesto a distribúcia ešte neboli overené. Táto skúška nepokrýva celý regresný scenár vo vlastnom builde.
+- Podpisovanie: prihlásenie a výber schváleného tímu v Xcode aj platná lokálna Apple Development identita overené. Pri prvom pokuse chýbalo zariadenie; po jeho pripojení používateľ ponechal Developer Mode vypnutý. Vytvorenie profilu a spustenie na iPhone zostávajú otvorené. Expo CLI načíta z konfigurácie zhodný tím a bundle ID.
+- Fyzické zariadenie, podpis a inštalácia jeho binárky, aktualizácia už nainštalovanej vlastnej aplikácie, úplný VoiceOver, okrajové gesto a distribúcia ešte neboli overené. Táto skúška nepokrýva celý regresný scenár vo vlastnom builde.

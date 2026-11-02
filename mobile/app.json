@@ -8,6 +8,7 @@
     "scheme": "tankuj",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "appleTeamId": "P84RJ936C7",
       "bundleIdentifier": "com.vgodaly.tankuj",
       "icon": "./assets/expo.icon"
     },
