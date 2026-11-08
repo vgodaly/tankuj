@@ -1,6 +1,6 @@
 # Vlastný iOS vývojový build
 
-Overené 2. 11. 2026. Pracovný postup je lokálne zostavenie na Macu cez Expo CLI a Xcode. Cloudový EAS build a TestFlight nie sú súčasťou tohto kroku. Následná príprava podpisovania pre zariadenie je uvedená nižšie.
+Prvé zostavenie pre simulátor bolo overené 2. 11. 2026 a prvé spustenie na iPhone 8. 11. 2026. Pracovný postup je lokálne zostavenie na Macu cez Expo CLI a Xcode. Cloudový EAS build a TestFlight nie sú súčasťou tohto kroku. Následná príprava podpisovania pre zariadenie je uvedená nižšie.
 
 ## Konfigurácia a nástroje
 
@@ -45,7 +45,7 @@ V samostatnom Tankuj potom zvoľ „Mám zálohu – obnoviť údaje“, skontro
 
 ## Fyzický iPhone
 
-Používateľ sa prihlásil v Xcode a výslovne schválil priradenie tímu, vytvorenie vývojového certifikátu/profilu a registráciu identifikátora Tankuj a pripojeného zariadenia. Tím je nastavený v Expo konfigurácii aj lokálnom generovanom projekte. Xcode vytvorilo platnú identitu Apple Development. Pri prvom pokuse profil nevznikol: tím hlásil 0 registrovaných zariadení a chýbajúci profil. Používateľ potom pripojil iPhone 13 s iOS 27.0; káblové spojenie a párovanie sú overené. Dňa 8. 11. používateľ zapol Developer Mode a agent overil káblové pripojenie iPhonu 13 s iOS 27.2. Xcode vytvorilo vývojový profil, ktorý pokrýva Tankuj a pripojený iPhone. Dokončenie podpisu čaká na povolenie použitia kľúča Apple Development v Kľúčenke. Distribučný certifikát ani TestFlight sa nepripravujú.
+Používateľ sa prihlásil v Xcode a výslovne schválil priradenie tímu, vytvorenie vývojového certifikátu/profilu a registráciu identifikátora Tankuj a pripojeného zariadenia. Tím je nastavený v Expo konfigurácii aj lokálnom generovanom projekte. Xcode vytvorilo platnú identitu Apple Development. Pri prvom pokuse profil nevznikol: tím hlásil 0 registrovaných zariadení a chýbajúci profil. Používateľ potom pripojil iPhone 13 s iOS 27.0; káblové spojenie a párovanie sú overené. Dňa 8. 11. používateľ zapol Developer Mode a agent overil káblové pripojenie iPhonu 13 s iOS 27.2. Xcode vytvorilo vývojový profil, ktorý pokrýva Tankuj a pripojený iPhone. Po povolení kľúča Apple Development v Kľúčenke prešiel opakovaný build. Podpísaný Tankuj sa nainštaloval a spustil na iPhone 13 s iOS 27.2.
 
 1. Pripoj iPhone dátovým káblom a odomkni ho. Pri prvom spojení používateľ potvrdí dôveru Macu na telefóne. Ak ho Xcode nevidí, najprv over zobrazenie vo Finderi v časti Locations/Miesta; kábel určený iba na nabíjanie nestačí.
 2. Otvor `mobile/ios/Tankuj.xcworkspace`, nie samostatný projekt Pods. V targete Tankuj → Signing & Capabilities má byť tím Viktor Godály, bundle ID `com.vgodaly.tankuj` a automatické podpisovanie. V ponuke cieľov vyber konkrétny fyzický iPhone. Pri prvom pokuse môže Xcode dokončovať prípravu zariadenia.
@@ -70,7 +70,7 @@ npm run ios -- --device "$iphone_udid" \
   --binary /private/tmp/tankuj-iphone-derived/Build/Products/Debug-iphoneos/Tankuj.app
 ~~~
 
-Druhý príkaz použije hotovú podpísanú binárku a spustí Metro pre vývojový build.
+Ak podpis zlyhá s `errSecInternalComponent` pri výzve Kľúčenky, povoľ použitie kľúča Apple Development priamo v systémovom okne a zopakuj zostavenie. Druhý príkaz nainštaluje hotovú podpísanú binárku a spustí Metro. Pri prvom štarte vyber v Expo Dev Launcher dostupný server Tankuj. Po načítaní sa zobrazí slovenský úvod aplikácie.
 
 ## Kontrola na fyzickom zariadení
 
@@ -78,7 +78,7 @@ Výsledky zapisuj s modelom/iOS, konfiguráciou buildu, pozorovateľom a skutoč
 
 | Skúška | Podmienka úspechu | Stav |
 | --- | --- | --- |
-| Prvý štart a podpisovanie | Samostatný Tankuj sa otvorí na konkrétnom iPhone, správny identifikátor a evidencia | Profil overený. Podpis čaká na Kľúčenku |
+| Prvý štart a podpisovanie | Samostatný Tankuj sa otvorí na konkrétnom iPhone, správny identifikátor a evidencia | Prešlo 8. 11. na iPhone 13 s iOS 27.2. Agent v Device Hub overil úvod s výberom paliva a možnosťou obnovy zálohy |
 | Zápis, úprava, oba dôvody vymazania | [Základný QA scenár](manual-verification.md), rovnaké súhrny a medzery; namiesto Expo Go ukončovať samostatný Tankuj | Nevykonané |
 | Klávesnica a veľký text | Aktívne polia aj uloženie dostupné; čitateľné sumy, grafy a vysvetlenia | Nevykonané |
 | Návrat gestom a neuložené zmeny | Skutočné gesto od ľavého okraja; pokračovanie aj zahodenie zmien fungujú a nič sa samovoľne neuloží | Nevykonané |
@@ -95,5 +95,5 @@ Výsledky zapisuj s modelom/iOS, konfiguráciou buildu, pozorovateľom a skutoč
 - Binárka: `/private/tmp/tankuj-ios-build/Tankuj.app`, overený identifikátor `com.vgodaly.tankuj` a platforma iPhoneSimulator. Výstup v dočasnom priečinku je obnoviteľný build, nie záloha ani distribučný archív.
 - UI: samostatný Tankuj nainštalovaný na Tankuj Restore QA (iPhone 17, iOS 27.0), otvorený cez vlastnú ikonu a pripojený k Metro. Začal bez vozidla. Agent cez systémový výber súboru načítal skúšobnú JSON zálohu, skontroloval náhľad a obnovil ju do prázdneho kontajnera. UI zobrazilo Seat, 3 tankovania, 144 €, 90 l, 1,600 €/l, 6,00 l/100 km za 500 km/1 interval a upozornenie na medzeru. Read-only SQLite potvrdila ID, presné vstupy a bod medzery pri 10 200 km; oddelená QA evidencia Expo Go zostala na 4 tankovaniach, 163,20 €, 102 l a bez medzier.
 - Reštart: agent úplne vypol a zapol iba QA simulátor, cez vyhľadanie vlastnej ikony znovu otvoril Tankuj a overil rovnaké súhrny, spotrebu aj upozornenie na medzeru. Metro počas tohto testu bežalo; nešlo o Reload. Po skúške boli Metro aj QA simulátor vypnuté.
-- Podpisovanie: prihlásenie a výber schváleného tímu v Xcode aj platná lokálna Apple Development identita overené. Po zapnutí Developer Mode priamy príkaz `xcodebuild` vytvoril vývojový profil. Kontrola vloženého profilu potvrdila schválený tím, zhodu s bundle ID cez wildcard a prítomnosť pripojeného iPhonu. Dokončenie podpisu, inštalácia a spustenie na iPhone zostávajú otvorené.
-- Fyzické zariadenie, podpis a inštalácia jeho binárky, aktualizácia už nainštalovanej vlastnej aplikácie, úplný VoiceOver, okrajové gesto a distribúcia ešte neboli overené. Táto skúška nepokrýva celý regresný scenár vo vlastnom builde.
+- Podpisovanie: prihlásenie a výber schváleného tímu v Xcode aj platná lokálna Apple Development identita overené. Po zapnutí Developer Mode priamy príkaz `xcodebuild` vytvoril vývojový profil. Kontrola vloženého profilu potvrdila schválený tím, zhodu s bundle ID cez wildcard a prítomnosť pripojeného iPhonu. Opakované zostavenie prešlo po povolení kľúča. `codesign --verify --deep --strict` potvrdilo podpis a `Info.plist` identifikátor `com.vgodaly.tankuj` a platformu iPhoneOS.
+- Na fyzickom iPhone 13 s iOS 27.2 prešla inštalácia vývojového buildu a načítanie aplikácie z Metro. Agent v Device Hub videl úvod pre prázdnu evidenciu. Širšie skúšky na telefóne sú uvedené v tabuľke vyššie.
